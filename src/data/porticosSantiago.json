@@ -316,6 +316,102 @@
           }
         }
       ]
+    },
+    {
+      "id": "vespucio-sur",
+      "nombre": "Eje Sur-Oriente (Vespucio Sur)",
+      "nombreCorto": "Vespucio Sur",
+      "descripcion": "Ruta 78 · Gran Avenida · Vicuña Mackenna · Av. Grecia",
+      "concesionarias": "Autopista Vespucio Sur",
+      "distanciaTotalKm": 20.8,
+      "duracionEstimadaMin": 33,
+      "porticos": [
+        {
+          "id": "vs-p2",
+          "codigo": "P2",
+          "nombre": "Pórtico Lonquén – General Velásquez",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Oriente",
+          "comuna": "Cerrillos",
+          "lat": -33.5165,
+          "lng": -70.713,
+          "distanciaKm": 3.9,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 380,
+            "punta": 760,
+            "saturacion": 1140
+          }
+        },
+        {
+          "id": "vs-p4",
+          "codigo": "P4",
+          "nombre": "Pórtico General Velásquez – Gran Avenida",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Oriente",
+          "comuna": "La Cisterna",
+          "lat": -33.529,
+          "lng": -70.6695,
+          "distanciaKm": 4.3,
+          "duracionMin": 7,
+          "tarifas": {
+            "fuera_punta": 420,
+            "punta": 840,
+            "saturacion": 1260
+          }
+        },
+        {
+          "id": "vs-p6",
+          "codigo": "P6",
+          "nombre": "Pórtico Gran Avenida – Vicuña Mackenna",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Oriente",
+          "comuna": "La Florida",
+          "lat": -33.5225,
+          "lng": -70.612,
+          "distanciaKm": 5.4,
+          "duracionMin": 8,
+          "tarifas": {
+            "fuera_punta": 490,
+            "punta": 980,
+            "saturacion": 1470
+          }
+        },
+        {
+          "id": "vs-p8",
+          "codigo": "P8",
+          "nombre": "Pórtico Vicuña Mackenna – Quilín",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Norte",
+          "comuna": "Macul",
+          "lat": -33.495,
+          "lng": -70.5855,
+          "distanciaKm": 4.1,
+          "duracionMin": 7,
+          "tarifas": {
+            "fuera_punta": 450,
+            "punta": 900,
+            "saturacion": 1350
+          }
+        },
+        {
+          "id": "vs-p10",
+          "codigo": "P10",
+          "nombre": "Pórtico Quilín – Av. Grecia",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Norte",
+          "comuna": "Peñalolén",
+          "lat": -33.4715,
+          "lng": -70.5735,
+          "distanciaKm": 3.1,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 360,
+            "punta": 720,
+            "saturacion": 1080
+          }
+        }
+      ]
     }
   ]
 }

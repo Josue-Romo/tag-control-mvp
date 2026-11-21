@@ -1,0 +1,19 @@
+{
+  "name": "TAG Control",
+  "short_name": "TAG Control",
+  "description": "Tu viaje, tu gasto, siempre claro. Control de pórticos y presupuesto mensual de TAG en Santiago de Chile.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F8FAFC",
+  "theme_color": "#1E7E53",
+  "lang": "es-CL",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

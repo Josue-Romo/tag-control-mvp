@@ -67,10 +67,11 @@ export default function App() {
   );
 
   const handleSaveConfig = (nextConfig) => {
+    const isInitialOnboarding = !config.onboardingCompleted;
     setConfig(nextConfig);
     saveUserConfig(nextConfig);
     setShowSettingsModal(false);
-    trackEvent('budget_configured', {
+    trackEvent(isInitialOnboarding ? 'onboarding_completed' : 'budget_updated', {
       profile: nextConfig.profile,
       monthlyBudget: nextConfig.monthlyBudget,
     });
@@ -98,10 +99,12 @@ export default function App() {
       mode: 'gps',
     });
     trackEvent('trip_started', {
+      profile: config.profile,
+      monthlyBudget: config.monthlyBudget,
+      mode: 'gps',
       routeId: AUTO_GPS_ROUTE.id,
       routeName: AUTO_GPS_ROUTE.nombre,
       horario: detectedHorario,
-      mode: 'gps_auto',
     });
     setScreen('active');
   };
@@ -114,10 +117,12 @@ export default function App() {
       mode: 'simulation',
     });
     trackEvent('trip_started', {
+      profile: config.profile,
+      monthlyBudget: config.monthlyBudget,
+      mode: 'simulation',
       routeId: selectedRoute.id,
       routeName: selectedRoute.nombre,
       horario: selectedHorario,
-      mode: 'simulation',
     });
     setScreen('active');
   };
@@ -134,16 +139,21 @@ export default function App() {
       setSummaryFromHistory(false);
       setScreen('summary');
 
-      trackEvent('trip_finished', {
+      trackEvent('trip_completed', {
         tripId: completedTrip.id,
-        routeId: completedTrip.routeId,
-        horario: completedTrip.horario,
+        profile: config.profile,
+        monthlyBudget: config.monthlyBudget,
         mode: completedTrip.mode,
+        routeId: completedTrip.routeId,
+        routeName: completedTrip.routeName,
+        horario: completedTrip.horario,
         totalCost: completedTrip.totalCost,
         porticosCount: completedTrip.porticos.length,
+        totalDistanceKm: completedTrip.totalDistanceKm,
+        durationMin: completedTrip.durationMin,
       });
     },
-    [handleNotificationChange]
+    [config.monthlyBudget, config.profile, handleNotificationChange]
   );
 
   const handleCancelTrip = () => {

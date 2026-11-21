@@ -1,16 +1,99 @@
 const EVENTS_KEY = 'tag_control_analytics_events';
 const LEADS_KEY = 'tag_control_alert_leads';
+const SESSION_KEY = 'tag_control_session_id';
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mqpqykke';
+
+let fallbackSessionId = null;
 
 /**
- * Analytics tracker ready to connect to GA4 / PostHog / Mixpanel.
- * Stores events locally for P2 field test validation and diagnostics.
+ * Returns a persistent sessionId for the current browser tab/session
+ * so Formspree rows from the same driver flow can be grouped together.
+ */
+export function getSessionId() {
+  if (typeof window !== 'undefined') {
+    try {
+      const existing = window.sessionStorage.getItem(SESSION_KEY);
+      if (existing) return existing;
+
+      const generated = `sess_${Date.now().toString(36)}_${Math.random()
+        .toString(36)
+        .slice(2, 8)}`;
+      window.sessionStorage.setItem(SESSION_KEY, generated);
+      return generated;
+    } catch {
+      // Fall back to in-memory session id if sessionStorage is unavailable
+    }
+  }
+
+  if (!fallbackSessionId) {
+    fallbackSessionId = `sess_${Date.now().toString(36)}_${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+  }
+  return fallbackSessionId;
+}
+
+/**
+ * Ensures all payload fields are clean top-level primitives for Formspree columns.
+ */
+function flattenPayload(payload = {}) {
+  const flat = {};
+  if (!payload || typeof payload !== 'object') return flat;
+
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value === undefined) return;
+    if (value === null || typeof value !== 'object') {
+      flat[key] = value;
+    } else {
+      try {
+        flat[key] = JSON.stringify(value);
+      } catch {
+        flat[key] = String(value);
+      }
+    }
+  });
+
+  return flat;
+}
+
+/**
+ * Sends telemetry silently to Formspree without ever throwing or blocking UX.
+ */
+async function sendToFormspree(body) {
+  if (typeof fetch !== 'function') return;
+
+  try {
+    await fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(body),
+      keepalive: true,
+    });
+  } catch {
+    // Silent fail on poor highway signal or offline mode
+  }
+}
+
+/**
+ * Tracks a product event:
+ * 1. Persists a backup copy in localStorage (for offline P2 diagnostics/export).
+ * 2. Sends the flattened event asynchronously and silently to Formspree.
  */
 export function trackEvent(eventName, payload = {}) {
+  const timestamp = new Date().toISOString();
+  const sessionId = getSessionId();
+  const flatPayload = flattenPayload(payload);
+
   const entry = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     event: eventName,
-    timestamp: new Date().toISOString(),
-    payload,
+    eventName,
+    timestamp,
+    sessionId,
+    payload: flatPayload,
   };
 
   try {
@@ -21,18 +104,27 @@ export function trackEvent(eventName, payload = {}) {
     // Ignore storage quota errors in private browsing
   }
 
-  // Hook ready for external analytics SDKs
+  // Send asynchronously and silently to Formspree with top-level columns
+  const formspreePayload = {
+    eventName,
+    timestamp,
+    sessionId,
+    ...flatPayload,
+  };
+  void sendToFormspree(formspreePayload);
+
+  // Hook ready for external analytics SDKs if added later
   if (typeof window !== 'undefined') {
     if (typeof window.gtag === 'function') {
-      window.gtag('event', eventName, payload);
+      window.gtag('event', eventName, flatPayload);
     }
     if (window.posthog && typeof window.posthog.capture === 'function') {
-      window.posthog.capture(eventName, payload);
+      window.posthog.capture(eventName, flatPayload);
     }
   }
 
   if (import.meta.env.DEV) {
-    console.info('[TAG Control Analytics]', eventName, payload);
+    console.info('[TAG Control Analytics]', formspreePayload);
   }
 
   return entry;
@@ -65,13 +157,14 @@ export function saveAlertLead({ contact, patente, profile, budget, monthlySpent,
     // Ignore storage errors
   }
 
-  trackEvent('weekly_alert_signup', {
-    source,
-    hasPatente: Boolean(lead.patente),
+  trackEvent('alert_subscribed', {
+    contact: lead.contact,
+    patente: lead.patente || '',
     contactType: lead.contact.includes('@') ? 'email' : 'whatsapp',
     profile,
-    budget,
+    monthlyBudget: budget,
     monthlySpent,
+    source,
   });
 
   return lead;

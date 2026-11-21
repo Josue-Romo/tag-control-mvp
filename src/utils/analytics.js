@@ -1,9 +1,42 @@
+const REMOTE_TRACKING_ENABLED = false;
+
 const EVENTS_KEY = 'tag_control_analytics_events';
 const LEADS_KEY = 'tag_control_alert_leads';
 const SESSION_KEY = 'tag_control_session_id';
+const LIVE_MODE_KEY = 'tag_control_remote_tracking_live';
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mqpqykke';
+const CRITICAL_REMOTE_EVENTS = new Set(['trip_completed', 'alert_subscribed']);
 
 let fallbackSessionId = null;
+
+/**
+ * Checks whether remote Formspree telemetry is active.
+ * Defaults to REMOTE_TRACKING_ENABLED (false for internal review) and can be
+ * dynamically enabled for the current tab via ?live=1 (persisted in sessionStorage).
+ */
+export function isRemoteTrackingEnabled() {
+  if (typeof window !== 'undefined') {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const liveParam = params.get('live');
+      if (liveParam === '1') {
+        window.sessionStorage.setItem(LIVE_MODE_KEY, '1');
+        return true;
+      }
+      if (liveParam === '0') {
+        window.sessionStorage.removeItem(LIVE_MODE_KEY);
+        return false;
+      }
+      if (window.sessionStorage.getItem(LIVE_MODE_KEY) === '1') {
+        return true;
+      }
+    } catch {
+      // Ignore URL or sessionStorage access errors
+    }
+  }
+
+  return REMOTE_TRACKING_ENABLED;
+}
 
 /**
  * Returns a persistent sessionId for the current browser tab/session
@@ -79,8 +112,10 @@ async function sendToFormspree(body) {
 
 /**
  * Tracks a product event:
- * 1. Persists a backup copy in localStorage (for offline P2 diagnostics/export).
- * 2. Sends the flattened event asynchronously and silently to Formspree.
+ * 1. Always persists a local copy in localStorage (for offline P2 diagnostics/export).
+ * 2. Sends to Formspree ONLY when remote tracking is enabled (REMOTE_TRACKING_ENABLED
+ *    or ?live=1 in URL/sessionStorage) AND the event is critical for P2 validation
+ *    ('trip_completed' or 'alert_subscribed').
  */
 export function trackEvent(eventName, payload = {}) {
   const timestamp = new Date().toISOString();
@@ -104,14 +139,24 @@ export function trackEvent(eventName, payload = {}) {
     // Ignore storage quota errors in private browsing
   }
 
-  // Send asynchronously and silently to Formspree with top-level columns
   const formspreePayload = {
     eventName,
     timestamp,
     sessionId,
     ...flatPayload,
   };
-  void sendToFormspree(formspreePayload);
+
+  const remoteEnabled = isRemoteTrackingEnabled();
+  const shouldSendRemote = remoteEnabled && CRITICAL_REMOTE_EVENTS.has(eventName);
+
+  if (shouldSendRemote) {
+    void sendToFormspree(formspreePayload);
+    if (import.meta.env.DEV) {
+      console.info('[Analytics Remoto -> Formspree]', formspreePayload);
+    }
+  } else {
+    console.info('[Analytics Local]', formspreePayload);
+  }
 
   // Hook ready for external analytics SDKs if added later
   if (typeof window !== 'undefined') {
@@ -121,10 +166,6 @@ export function trackEvent(eventName, payload = {}) {
     if (window.posthog && typeof window.posthog.capture === 'function') {
       window.posthog.capture(eventName, flatPayload);
     }
-  }
-
-  if (import.meta.env.DEV) {
-    console.info('[TAG Control Analytics]', formspreePayload);
   }
 
   return entry;

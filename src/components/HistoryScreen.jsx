@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ChevronRight,
   Download,
+  Navigation,
   RotateCcw,
   Terminal,
 } from 'lucide-react';
@@ -102,7 +103,11 @@ export default function HistoryScreen({
           <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden mt-2.5">
             <div
               className={`h-full rounded-full ${status.barClass}`}
-              style={{ width: `${Math.max(4, status.clampedPercent)}%` }}
+              style={{
+                width: `${
+                  monthlySpent === 0 ? 0 : Math.max(4, status.clampedPercent)
+                }%`,
+              }}
             />
           </div>
         </section>
@@ -114,13 +119,29 @@ export default function HistoryScreen({
           </h2>
 
           {trips.length === 0 ? (
-            <div className="bg-white rounded-2xl p-6 text-center border border-slate-200/70">
-              <p className="text-sm font-bold text-slate-700">
-                Aún no tienes viajes registrados
-              </p>
-              <p className="text-xs text-slate-500 mt-1">
-                Inicia un trayecto en simulación o GPS real para ver tu detalle aquí.
-              </p>
+            <div className="bg-white rounded-[22px] p-6 text-center shadow-2xs ring-1 ring-slate-900/5 space-y-3">
+              <div className="mx-auto w-12 h-12 rounded-2xl bg-emerald-50 text-[#1E7E53] flex items-center justify-center">
+                <Navigation className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-extrabold text-slate-900">
+                  Aún no tienes viajes registrados
+                </p>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Vuelve al inicio para activar el{' '}
+                  <strong className="text-slate-700">seguimiento automático (GPS)</strong>{' '}
+                  mientras conduces o prueba una{' '}
+                  <strong className="text-slate-700">simulación de trayecto</strong>{' '}
+                  desde casa.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onBack}
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#1E7E53] hover:bg-[#15803D] text-white text-xs font-bold px-4 py-2.5 shadow-xs transition cursor-pointer"
+              >
+                Ir a iniciar mi primer viaje
+              </button>
             </div>
           ) : (
             trips.map((trip) => (

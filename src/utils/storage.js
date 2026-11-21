@@ -1,7 +1,6 @@
-import porticosData from '../data/porticosSantiago.json';
-
 const CONFIG_KEY = 'tag_control_user_config_v1';
 const TRIPS_KEY = 'tag_control_trips_v1';
+const LEGACY_SEED_IDS = new Set(['seed-trip-1', 'seed-trip-2']);
 
 export const DRIVER_PROFILES = [
   {
@@ -34,63 +33,6 @@ export const DEFAULT_CONFIG = {
   soundEnabled: true,
 };
 
-function buildSeedTrips() {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = now.getMonth();
-  const d = now.getDate();
-
-  // Keep seed trips inside the current calendar month so monthly spend is accurate
-  const day1 = Math.max(1, d - 4);
-  const day2 = Math.max(1, d - 1);
-
-  const costanera = porticosData.rutas.find((r) => r.id === 'costanera-norte');
-  const central = porticosData.rutas.find((r) => r.id === 'autopista-central');
-
-  const buildFromRoute = (route, horario, startDate, tripId, count) => {
-    const selected = route.porticos.slice(0, count);
-    let cursor = new Date(startDate);
-    let total = 0;
-    let totalKm = 0;
-    let totalMin = 0;
-
-    const crossings = selected.map((p) => {
-      cursor = new Date(cursor.getTime() + p.duracionMin * 60 * 1000);
-      const costo = p.tarifas[horario];
-      total += costo;
-      totalKm += p.distanciaKm;
-      totalMin += p.duracionMin;
-      return {
-        ...p,
-        costo,
-        crossedAt: cursor.toISOString(),
-      };
-    });
-
-    return {
-      id: tripId,
-      routeId: route.id,
-      routeName: route.nombre,
-      horario,
-      mode: 'simulation',
-      startedAt: startDate.toISOString(),
-      endedAt: cursor.toISOString(),
-      totalCost: total,
-      totalDistanceKm: Number(totalKm.toFixed(1)),
-      durationMin: totalMin,
-      porticos: crossings,
-    };
-  };
-
-  const trip1Start = new Date(y, m, day1, 8, 12);
-  const trip2Start = new Date(y, m, day2, 18, 5);
-
-  return [
-    buildFromRoute(central, 'punta', trip2Start, 'seed-trip-2', 4),
-    buildFromRoute(costanera, 'punta', trip1Start, 'seed-trip-1', 5),
-  ];
-}
-
 export function loadUserConfig() {
   try {
     const raw = localStorage.getItem(CONFIG_KEY);
@@ -112,14 +54,18 @@ export function saveUserConfig(config) {
 export function loadTrips() {
   try {
     const raw = localStorage.getItem(TRIPS_KEY);
-    if (!raw) {
-      const seeded = buildSeedTrips();
-      localStorage.setItem(TRIPS_KEY, JSON.stringify(seeded));
-      return seeded;
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    // Strip any legacy demo seed trips if present from older builds
+    const cleaned = parsed.filter((trip) => !LEGACY_SEED_IDS.has(trip?.id));
+    if (cleaned.length !== parsed.length) {
+      localStorage.setItem(TRIPS_KEY, JSON.stringify(cleaned));
     }
-    return JSON.parse(raw);
+    return cleaned;
   } catch {
-    return buildSeedTrips();
+    return [];
   }
 }
 

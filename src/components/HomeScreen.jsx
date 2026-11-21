@@ -140,7 +140,11 @@ export default function HomeScreen({
             <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${status.barClass}`}
-                style={{ width: `${Math.max(4, status.clampedPercent)}%` }}
+                style={{
+                  width: `${
+                    monthlySpent === 0 ? 0 : Math.max(4, status.clampedPercent)
+                  }%`,
+                }}
               />
             </div>
             <div className="flex items-center justify-between text-[11.5px] mt-2">
@@ -176,26 +180,32 @@ export default function HomeScreen({
                 <p className="text-[11px] font-medium text-slate-500 leading-tight">
                   Proyección de cierre de mes
                 </p>
-                <p className="text-[11px] text-slate-400">
-                  Día {projection.dayOfMonth} de {projection.daysInMonth}
+                <p className="text-[11px] text-slate-400 leading-snug">
+                  {monthlySpent === 0
+                    ? 'Inicia tu primer viaje para proyectar tu mes'
+                    : `Día ${projection.dayOfMonth} de ${projection.daysInMonth}`}
                 </p>
               </div>
             </div>
             <div className="text-right shrink-0">
               <p
                 className={`text-sm font-extrabold tabular-nums ${
-                  projection.projected > config.monthlyBudget
+                  monthlySpent === 0
+                    ? 'text-slate-700'
+                    : projection.projected > config.monthlyBudget
                     ? 'text-amber-600'
                     : 'text-[#1E7E53]'
                 }`}
               >
-                {formatCLP(projection.projected)}
+                {formatCLP(monthlySpent === 0 ? 0 : projection.projected)}
               </p>
-              <p className="text-[10.5px] text-slate-400">
-                {projection.projected > config.monthlyBudget
-                  ? 'Sobre tu meta'
-                  : 'Dentro de tu meta'}
-              </p>
+              {monthlySpent > 0 && (
+                <p className="text-[10.5px] text-slate-400">
+                  {projection.projected > config.monthlyBudget
+                    ? 'Sobre tu meta'
+                    : 'Dentro de tu meta'}
+                </p>
+              )}
             </div>
           </div>
         </section>

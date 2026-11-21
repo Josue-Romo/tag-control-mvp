@@ -130,10 +130,19 @@ export default function ActiveTripScreen({
         timelinePorticos.reduce((sum, p) => sum + p.distanciaKm, 0).toFixed(1)
       );
 
+      let resolvedRouteName = route.nombre;
+      if (route.id === 'auto-gps-santiago' && timelinePorticos.length > 0) {
+        const uniqueHighways = [...new Set(timelinePorticos.map((p) => p.autopista))];
+        resolvedRouteName =
+          uniqueHighways.length === 1
+            ? uniqueHighways[0]
+            : `${uniqueHighways[0]} y otras`;
+      }
+
       onFinishTrip({
         id: `trip-${Date.now()}`,
         routeId: route.id,
-        routeName: route.nombre,
+        routeName: resolvedRouteName,
         horario,
         mode,
         startedAt: startedAt.toISOString(),
@@ -434,7 +443,13 @@ export default function ActiveTripScreen({
         <div className="mt-5">
           <div className="flex items-center justify-between text-[11px] text-slate-300 mb-1.5">
             <span className="font-semibold">
-              {crossedPorticos.length} de {route.porticos.length} pórticos
+              {route.id === 'auto-gps-santiago'
+                ? `${crossedPorticos.length} ${
+                    crossedPorticos.length === 1
+                      ? 'pórtico detectado'
+                      : 'pórticos detectados'
+                  } · ${route.porticos.length} monitoreados en RM`
+                : `${crossedPorticos.length} de ${route.porticos.length} pórticos`}
             </span>
             <span className="tabular-nums">{formatDistance(tripDistanceKm)}</span>
           </div>
@@ -523,7 +538,9 @@ export default function ActiveTripScreen({
         <div className="bg-white rounded-[22px] p-4 shadow-sm ring-1 ring-slate-900/5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Pórticos del trayecto
+              {route.id === 'auto-gps-santiago'
+                ? 'Pórticos detectados y cercanos'
+                : 'Pórticos del trayecto'}
             </h3>
             <span className="text-[11px] font-semibold text-slate-500">
               Tarifa {horarioObj.shortLabel}
@@ -531,14 +548,22 @@ export default function ActiveTripScreen({
           </div>
 
           <div className="space-y-2.5">
-            {route.porticos.map((p, index) => {
+            {(route.id === 'auto-gps-santiago'
+              ? [
+                  ...crossedPorticos,
+                  ...route.porticos
+                    .filter((item) => !crossedPorticos.some((c) => c.id === item.id))
+                    .slice(0, 4),
+                ]
+              : route.porticos
+            ).map((p, index) => {
               const crossed = crossedPorticos.find((c) => c.id === p.id);
               const isNext =
                 !crossed &&
-                index ===
-                  route.porticos.findIndex(
+                p.id ===
+                  route.porticos.find(
                     (item) => !crossedPorticos.some((c) => c.id === item.id)
-                  );
+                  )?.id;
               const cost = p.tarifas[horario] || p.tarifas.punta;
 
               return (

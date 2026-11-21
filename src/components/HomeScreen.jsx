@@ -1,20 +1,24 @@
+import { useState } from 'react';
 import {
   Car,
+  ChevronDown,
   Clock,
+  FlaskConical,
   History,
-  MapPin,
   Navigation,
   Play,
-  Radio,
   SlidersHorizontal,
+  Sparkles,
   TrendingUp,
 } from 'lucide-react';
 import porticosData from '../data/porticosSantiago.json';
 import {
   calculateMonthProjection,
+  detectCurrentHorario,
   formatCLP,
   formatDistance,
   formatDuration,
+  formatTime,
   getBudgetStatus,
 } from '../utils/format';
 import { DRIVER_PROFILES } from '../utils/storage';
@@ -26,19 +30,26 @@ export default function HomeScreen({
   tripsCount,
   selectedRouteId,
   selectedHorario,
-  tripMode,
   onSelectRoute,
   onSelectHorario,
-  onSelectMode,
-  onStartTrip,
+  onStartAutoGps,
+  onStartSimulation,
   onOpenSettings,
   onOpenHistory,
 }) {
+  const [simExpanded, setSimExpanded] = useState(false);
+
   const status = getBudgetStatus(monthlySpent, config.monthlyBudget);
   const remaining = config.monthlyBudget - monthlySpent;
   const projection = calculateMonthProjection(monthlySpent);
   const profileObj =
     DRIVER_PROFILES.find((p) => p.id === config.profile) || DRIVER_PROFILES[0];
+
+  const now = new Date();
+  const currentHorarioId = detectCurrentHorario(now);
+  const currentHorarioObj =
+    porticosData.horarios.find((h) => h.id === currentHorarioId) ||
+    porticosData.horarios[0];
 
   const selectedRoute =
     porticosData.rutas.find((r) => r.id === selectedRouteId) ||
@@ -49,11 +60,11 @@ export default function HomeScreen({
     0
   );
 
-  const monthName = new Date().toLocaleDateString('es-CL', { month: 'long' });
+  const monthName = now.toLocaleDateString('es-CL', { month: 'long' });
   const monthLabel = monthName.charAt(0).toUpperCase() + monthName.slice(1);
 
   return (
-    <div className="flex flex-col min-h-full pb-6">
+    <div className="flex flex-col min-h-full pb-7">
       {/* Top App Header */}
       <header className="px-5 pt-5 pb-3 flex items-center justify-between gap-2 bg-[#F8FAFC] sticky top-0 z-10">
         <div className="flex items-center gap-2.5 min-w-0">
@@ -189,185 +200,185 @@ export default function HomeScreen({
           </div>
         </section>
 
-        {/* Trip Setup Card */}
-        <section className="bg-white rounded-[24px] p-5 shadow-sm ring-1 ring-slate-900/5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-[15px] font-extrabold text-slate-900">
-                Iniciar nuevo trayecto
-              </h2>
-              <p className="text-xs text-slate-500">
-                Autopistas urbanas de Santiago
-              </p>
-            </div>
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#1E7E53] bg-emerald-50 px-2.5 py-1 rounded-full">
-              <MapPin className="w-3 h-3" />
-              RM
-            </span>
-          </div>
+        {/* PRIMARY HERO ACTION: Automatic Real GPS Tracking */}
+        <section className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-[#1E7E53] via-[#1B764D] to-[#15803D] p-5 text-white shadow-[0_16px_36px_-14px_rgba(21,128,61,0.55)]">
+          {/* Subtle decorative radial glow */}
+          <div
+            className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 rounded-full bg-white/10 blur-2xl"
+            aria-hidden="true"
+          />
 
-          {/* Route selector (3 real Santiago routes) */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Ruta de Santiago
-            </label>
-            <div className="space-y-2">
-              {porticosData.rutas.map((ruta) => {
-                const isSelected = ruta.id === selectedRoute.id;
-                const routeCost = ruta.porticos.reduce(
-                  (acc, p) => acc + (p.tarifas[selectedHorario] || 0),
-                  0
-                );
-                return (
-                  <button
-                    key={ruta.id}
-                    type="button"
-                    onClick={() => onSelectRoute(ruta.id)}
-                    className={`w-full text-left rounded-2xl p-3.5 border transition cursor-pointer ${
-                      isSelected
-                        ? 'border-[#1E7E53] bg-emerald-50/45 ring-1 ring-[#1E7E53]'
-                        : 'border-slate-200/90 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="text-[13.5px] font-bold text-slate-900 leading-snug">
-                          {ruta.nombre}
-                        </p>
-                        <p className="text-[11.5px] text-slate-500 mt-0.5 truncate">
-                          {ruta.descripcion}
-                        </p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="block text-sm font-extrabold text-[#1E7E53] tabular-nums">
-                          {formatCLP(routeCost)}
-                        </span>
-                        <span className="text-[10px] text-slate-400">est.</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 mt-2 text-[11px] font-medium text-slate-500">
-                      <span className="inline-flex items-center gap-1">
-                        <PorticoIcon className="w-3.5 h-3.5 text-slate-400" />
-                        {ruta.porticos.length} pórticos
-                      </span>
-                      <span>·</span>
-                      <span>{formatDistance(ruta.distanciaTotalKm)}</span>
-                      <span>·</span>
-                      <span>{formatDuration(ruta.duracionEstimadaMin)}</span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Schedule block selector */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" />
-                Bloque horario
-              </label>
-              <span className="text-[11px] text-slate-400">
-                {
-                  porticosData.horarios.find((h) => h.id === selectedHorario)
-                    ?.rango
-                }
+          <div className="relative z-10">
+            <div className="flex items-center justify-between gap-2 mb-3.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-xs text-[11px] font-bold tracking-wide text-emerald-50">
+                <Sparkles className="w-3.5 h-3.5" />
+                Modo real · 100% automático
+              </span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-100/95 tabular-nums">
+                <Clock className="w-3 h-3" />
+                {formatTime(now)} · {currentHorarioObj.shortLabel}
               </span>
             </div>
-            <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-2xl">
-              {porticosData.horarios.map((h) => {
-                const active = selectedHorario === h.id;
-                return (
-                  <button
-                    key={h.id}
-                    type="button"
-                    onClick={() => onSelectHorario(h.id)}
-                    className={`py-2 px-1.5 rounded-xl text-[11.5px] font-bold transition cursor-pointer ${
-                      active
-                        ? 'bg-white text-slate-900 shadow-xs'
-                        : 'text-slate-500 hover:text-slate-800'
-                    }`}
-                  >
-                    {h.shortLabel}
-                  </button>
-                );
-              })}
-            </div>
+
+            <button
+              type="button"
+              onClick={onStartAutoGps}
+              className="w-full py-4 px-4 rounded-2xl bg-white hover:bg-emerald-50 active:scale-[0.99] text-[#15803D] font-extrabold text-[15.5px] shadow-md shadow-emerald-950/20 flex items-center justify-center gap-2.5 transition cursor-pointer"
+            >
+              <span className="w-7 h-7 rounded-xl bg-emerald-100 text-[#1E7E53] flex items-center justify-center shrink-0">
+                <Navigation className="w-4 h-4 fill-current" />
+              </span>
+              <span>Iniciar seguimiento automático (GPS)</span>
+            </button>
+
+            <p className="text-[12.5px] text-emerald-50/95 leading-relaxed mt-3 text-center">
+              Detecta automáticamente tus pórticos, autopistas y tarifa horaria
+              mientras conduces, sin configuración manual.
+            </p>
           </div>
+        </section>
 
-          {/* Tracking mode toggle: Simulation vs Real GPS */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Modo de detección de pórticos
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => onSelectMode('simulation')}
-                className={`rounded-2xl p-3 border text-left transition cursor-pointer ${
-                  tripMode === 'simulation'
-                    ? 'border-[#1E7E53] bg-emerald-50/50 ring-1 ring-[#1E7E53]'
-                    : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-1.5 mb-1">
-                  <Radio
-                    className={`w-4 h-4 ${
-                      tripMode === 'simulation'
-                        ? 'text-[#1E7E53]'
-                        : 'text-slate-400'
-                    }`}
-                  />
-                  <span className="text-xs font-bold text-slate-900">
-                    Simulación en Vivo
-                  </span>
-                </div>
-                <p className="text-[10.5px] text-slate-500 leading-snug">
-                  Cruza pórticos cada 3.5 seg. Ideal para pruebas rápidas.
-                </p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onSelectMode('gps')}
-                className={`rounded-2xl p-3 border text-left transition cursor-pointer ${
-                  tripMode === 'gps'
-                    ? 'border-[#1E7E53] bg-emerald-50/50 ring-1 ring-[#1E7E53]'
-                    : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-1.5 mb-1">
-                  <Navigation
-                    className={`w-4 h-4 ${
-                      tripMode === 'gps' ? 'text-[#1E7E53]' : 'text-slate-400'
-                    }`}
-                  />
-                  <span className="text-xs font-bold text-slate-900">
-                    Modo GPS Real
-                  </span>
-                </div>
-                <p className="text-[10.5px] text-slate-500 leading-snug">
-                  Usa geolocalización real al entrar al radio del pórtico.
-                </p>
-              </button>
-            </div>
-          </div>
-
-          {/* Primary Start CTA */}
+        {/* SECONDARY DISCREET BLOCK: Simulation / Demo Mode */}
+        <section className="bg-white/90 rounded-[22px] border border-slate-200/90 shadow-2xs overflow-hidden">
           <button
             type="button"
-            onClick={onStartTrip}
-            className="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-[#1E7E53] to-[#15803D] hover:brightness-105 active:scale-[0.99] text-white font-bold text-[15px] shadow-lg shadow-emerald-900/20 flex items-center justify-between transition cursor-pointer"
+            onClick={() => setSimExpanded((open) => !open)}
+            className="w-full p-4 flex items-start justify-between gap-3 text-left hover:bg-slate-50/70 transition cursor-pointer"
+            aria-expanded={simExpanded}
           >
-            <span className="flex items-center gap-2">
-              <Play className="w-4 h-4 fill-current" />
-              Iniciar viaje
-            </span>
-            <span className="text-xs font-semibold bg-white/18 px-2.5 py-1 rounded-xl tabular-nums">
-              Est. {formatCLP(estimatedTripCost)}
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0 mt-0.5">
+                <FlaskConical className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="text-[13.5px] font-bold text-slate-800 leading-snug">
+                    Simular trayecto de prueba (sin moverse)
+                  </h2>
+                </div>
+                <p className="text-[11.5px] text-slate-500 leading-snug mt-0.5">
+                  Úsalo para probar cómo calcula tu gasto desde casa o en la demo.
+                </p>
+              </div>
+            </div>
+
+            <span className="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center shrink-0 mt-1">
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  simExpanded ? 'rotate-180' : ''
+                }`}
+              />
             </span>
           </button>
+
+          {simExpanded && (
+            <div className="px-4 pb-4 pt-1 border-t border-slate-100 space-y-4">
+              {/* Route selector */}
+              <div className="space-y-2 pt-2">
+                <label className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
+                  Ruta de prueba (Santiago)
+                </label>
+                <div className="space-y-2">
+                  {porticosData.rutas.map((ruta) => {
+                    const isSelected = ruta.id === selectedRoute.id;
+                    const routeCost = ruta.porticos.reduce(
+                      (acc, p) => acc + (p.tarifas[selectedHorario] || 0),
+                      0
+                    );
+                    return (
+                      <button
+                        key={ruta.id}
+                        type="button"
+                        onClick={() => onSelectRoute(ruta.id)}
+                        className={`w-full text-left rounded-2xl p-3 border transition cursor-pointer ${
+                          isSelected
+                            ? 'border-slate-800 bg-slate-50 ring-1 ring-slate-800'
+                            : 'border-slate-200/90 bg-white hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-[13px] font-bold text-slate-900 leading-snug">
+                              {ruta.nombre}
+                            </p>
+                            <p className="text-[11px] text-slate-500 mt-0.5 truncate">
+                              {ruta.descripcion}
+                            </p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span className="block text-[13px] font-extrabold text-[#1E7E53] tabular-nums">
+                              {formatCLP(routeCost)}
+                            </span>
+                            <span className="text-[10px] text-slate-400">est.</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2.5 mt-1.5 text-[10.5px] font-medium text-slate-500">
+                          <span className="inline-flex items-center gap-1">
+                            <PorticoIcon className="w-3 h-3 text-slate-400" />
+                            {ruta.porticos.length} pórticos
+                          </span>
+                          <span>·</span>
+                          <span>{formatDistance(ruta.distanciaTotalKm)}</span>
+                          <span>·</span>
+                          <span>{formatDuration(ruta.duracionEstimadaMin)}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Schedule block selector */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    Bloque horario simulado
+                  </label>
+                  <span className="text-[10.5px] text-slate-400">
+                    {
+                      porticosData.horarios.find((h) => h.id === selectedHorario)
+                        ?.rango
+                    }
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-2xl">
+                  {porticosData.horarios.map((h) => {
+                    const active = selectedHorario === h.id;
+                    return (
+                      <button
+                        key={h.id}
+                        type="button"
+                        onClick={() => onSelectHorario(h.id)}
+                        className={`py-2 px-1.5 rounded-xl text-[11px] font-bold transition cursor-pointer ${
+                          active
+                            ? 'bg-white text-slate-900 shadow-xs'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                      >
+                        {h.shortLabel}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Secondary Simulation CTA */}
+              <button
+                type="button"
+                onClick={onStartSimulation}
+                className="w-full py-3.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-900 active:scale-[0.99] text-white font-bold text-[13.5px] flex items-center justify-between transition cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <Play className="w-4 h-4 fill-current" />
+                  Iniciar simulación en vivo
+                </span>
+                <span className="text-[11px] font-semibold bg-white/15 px-2.5 py-1 rounded-xl tabular-nums">
+                  Est. {formatCLP(estimatedTripCost)}
+                </span>
+              </button>
+            </div>
+          )}
         </section>
       </main>
     </div>

@@ -134,3 +134,38 @@ export function calculateMonthProjection(spent, now = new Date()) {
     daysRemaining: Math.max(0, daysInMonth - dayOfMonth),
   };
 }
+
+/**
+ * Determine Santiago highway tariff block from current system time:
+ * 'fuera_punta' | 'punta' | 'saturacion'
+ */
+export function detectCurrentHorario(now = new Date()) {
+  const day = now.getDay(); // 0 = Sun, 6 = Sat
+  const minutes = now.getHours() * 60 + now.getMinutes();
+
+  const isWeekday = day >= 1 && day <= 5;
+  if (isWeekday) {
+    // Saturación (peak congestion windows on Santiago urban highways)
+    if (
+      (minutes >= 7 * 60 + 30 && minutes < 9 * 60) ||
+      (minutes >= 18 * 60 && minutes < 19 * 60 + 30)
+    ) {
+      return 'saturacion';
+    }
+    // Hora Punta
+    if (
+      (minutes >= 7 * 60 && minutes < 10 * 60) ||
+      (minutes >= 17 * 60 && minutes < 20 * 60 + 30)
+    ) {
+      return 'punta';
+    }
+    return 'fuera_punta';
+  }
+
+  // Sunday evening return peak
+  if (day === 0 && minutes >= 18 * 60 && minutes < 21 * 60) {
+    return 'punta';
+  }
+
+  return 'fuera_punta';
+}

@@ -8,6 +8,7 @@ import {
   saveTrips,
   saveUserConfig,
 } from './utils/storage';
+import { detectCurrentHorario } from './utils/format';
 import { getSavedAlertLeads, trackEvent } from './utils/analytics';
 import PhoneShell from './components/PhoneShell';
 import OnboardingModal from './components/OnboardingModal';
@@ -16,6 +17,14 @@ import ActiveTripScreen from './components/ActiveTripScreen';
 import PorticoNotification from './components/PorticoNotification';
 import TripSummaryScreen from './components/TripSummaryScreen';
 import HistoryScreen from './components/HistoryScreen';
+
+const AUTO_GPS_ROUTE = {
+  id: 'auto-gps-santiago',
+  nombre: 'Seguimiento automático · Red Santiago',
+  nombreCorto: 'Red Santiago (GPS)',
+  descripcion: 'Vespucio Norte · Costanera Norte · Autopista Central',
+  porticos: porticosData.rutas.flatMap((r) => r.porticos),
+};
 
 export default function App() {
   const [config, setConfig] = useState(() => loadUserConfig());
@@ -29,7 +38,7 @@ export default function App() {
     porticosData.rutas[0].id
   );
   const [selectedHorario, setSelectedHorario] = useState('punta');
-  const [tripMode, setTripMode] = useState('simulation');
+  const [activeSession, setActiveSession] = useState(null);
 
   const [activeNotification, setActiveNotification] = useState(null);
   const [summaryTrip, setSummaryTrip] = useState(null);
@@ -80,13 +89,35 @@ export default function App() {
     }
   }, []);
 
-  const handleStartTrip = () => {
+  const handleStartAutoGps = () => {
     handleNotificationChange(null);
+    const detectedHorario = detectCurrentHorario(new Date());
+    setActiveSession({
+      route: AUTO_GPS_ROUTE,
+      horario: detectedHorario,
+      mode: 'gps',
+    });
+    trackEvent('trip_started', {
+      routeId: AUTO_GPS_ROUTE.id,
+      routeName: AUTO_GPS_ROUTE.nombre,
+      horario: detectedHorario,
+      mode: 'gps_auto',
+    });
+    setScreen('active');
+  };
+
+  const handleStartSimulation = () => {
+    handleNotificationChange(null);
+    setActiveSession({
+      route: selectedRoute,
+      horario: selectedHorario,
+      mode: 'simulation',
+    });
     trackEvent('trip_started', {
       routeId: selectedRoute.id,
       routeName: selectedRoute.nombre,
       horario: selectedHorario,
-      mode: tripMode,
+      mode: 'simulation',
     });
     setScreen('active');
   };
@@ -117,7 +148,10 @@ export default function App() {
 
   const handleCancelTrip = () => {
     handleNotificationChange(null);
-    trackEvent('trip_cancelled', { routeId: selectedRoute.id });
+    trackEvent('trip_cancelled', {
+      routeId: activeSession?.route?.id || selectedRoute.id,
+    });
+    setActiveSession(null);
     setScreen('home');
   };
 
@@ -181,21 +215,20 @@ export default function App() {
           tripsCount={trips.length}
           selectedRouteId={selectedRouteId}
           selectedHorario={selectedHorario}
-          tripMode={tripMode}
           onSelectRoute={setSelectedRouteId}
           onSelectHorario={setSelectedHorario}
-          onSelectMode={setTripMode}
-          onStartTrip={handleStartTrip}
+          onStartAutoGps={handleStartAutoGps}
+          onStartSimulation={handleStartSimulation}
           onOpenSettings={() => setShowSettingsModal(true)}
           onOpenHistory={handleOpenHistory}
         />
       )}
 
-      {screen === 'active' && (
+      {screen === 'active' && activeSession && (
         <ActiveTripScreen
-          route={selectedRoute}
-          horario={selectedHorario}
-          mode={tripMode}
+          route={activeSession.route}
+          horario={activeSession.horario}
+          mode={activeSession.mode}
           monthlySpentBeforeTrip={monthlySpent}
           monthlyBudget={config.monthlyBudget}
           soundEnabled={config.soundEnabled}

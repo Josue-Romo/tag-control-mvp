@@ -18,6 +18,10 @@
   font-variant-numeric: tabular-nums;
 }
 
+.pb-safe {
+  padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+}
+
 @keyframes notification-slide-in {
   0% {
     opacity: 0;

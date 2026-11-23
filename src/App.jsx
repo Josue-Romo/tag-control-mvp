@@ -137,6 +137,7 @@ export default function App() {
       });
       setSummaryTrip(completedTrip);
       setSummaryFromHistory(false);
+      setActiveSession(null);
       setScreen('summary');
 
       trackEvent('trip_completed', {

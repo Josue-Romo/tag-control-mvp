@@ -475,7 +475,7 @@ export default function ActiveTripScreen({
   }
 
   return (
-    <div className="flex flex-col min-h-full pb-6 bg-[#F8FAFC]">
+    <div className="flex flex-col min-h-full pb-safe bg-[#F8FAFC]">
       {/* Dark top telemetry header */}
       <div className="bg-gradient-to-b from-slate-900 to-slate-800 text-white px-5 pt-5 pb-7 rounded-b-[28px] shadow-md">
         <div className="flex items-center justify-between gap-2 mb-4">
@@ -789,36 +789,54 @@ export default function ActiveTripScreen({
         </div>
 
         {/* Action controls */}
-        <div className="space-y-2 pt-1">
+        <div className="space-y-2 pt-2 pb-safe">
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={handleManualNext}
               disabled={crossedPorticos.length >= route.porticos.length}
-              className="py-3 px-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-45 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer"
+              className="py-3.5 px-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-45 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer"
             >
-              <PorticoIcon className="w-4 h-4 text-[#1E7E53]" />
-              {mode === 'gps' ? 'Registrar paso manual' : 'Siguiente pórtico'}
+              <PorticoIcon className="w-4 h-4 text-[#1E7E53] shrink-0" />
+              <span>
+                {mode === 'gps' ? 'Registrar paso manual' : 'Siguiente pórtico'}
+              </span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => completeTrip(crossedPorticos)}
-              disabled={crossedPorticos.length === 0}
-              className="py-3 px-3 rounded-2xl bg-[#1E7E53] hover:bg-[#15803D] disabled:opacity-45 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer"
-            >
-              <Flag className="w-3.5 h-3.5" />
-              Finalizar viaje
-            </button>
+            {crossedPorticos.length === 0 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  finishedRef.current = true;
+                  onNotificationChange(null);
+                  onCancelTrip();
+                }}
+                className="py-3.5 px-3 rounded-2xl bg-slate-200/90 hover:bg-slate-300/80 active:scale-[0.99] border border-slate-300/70 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer"
+              >
+                <Flag className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                <span>Terminar sin cobros</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => completeTrip(crossedPorticos)}
+                className="py-3.5 px-3 rounded-2xl bg-[#1E7E53] hover:bg-[#15803D] active:scale-[0.99] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer"
+              >
+                <Flag className="w-3.5 h-3.5 shrink-0" />
+                <span>Finalizar viaje</span>
+              </button>
+            )}
           </div>
 
-          <button
-            type="button"
-            onClick={onCancelTrip}
-            className="w-full py-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 transition cursor-pointer"
-          >
-            Cancelar viaje sin guardar
-          </button>
+          {crossedPorticos.length > 0 && (
+            <button
+              type="button"
+              onClick={onCancelTrip}
+              className="w-full py-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 transition cursor-pointer"
+            >
+              Cancelar viaje sin guardar
+            </button>
+          )}
         </div>
       </div>
     </div>

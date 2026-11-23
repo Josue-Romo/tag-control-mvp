@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   CheckCircle2,
+  Download,
   FastForward,
   Flag,
   Lock,
@@ -21,11 +22,18 @@ import {
   haversineDistanceMeters,
 } from '../utils/format';
 import { trackEvent } from '../utils/analytics';
+import {
+  downloadGpsDebugLog,
+  saveGpsDebugLog,
+} from '../utils/gpsDebugLog';
 import PorticoIcon from './PorticoIcon';
 import PorticoNotification from './PorticoNotification';
 
 const SIMULATION_INTERVAL_MS = 3500;
-const DETECTION_RADIUS_METERS = porticosData.metadata.radioDeteccionMetros || 250;
+const DETECTION_RADIUS_METERS = 90;
+const MAX_GPS_ACCURACY_METERS = 65;
+const MIN_SPEED_MPS = 3; // ~10.8 km/h
+const REQUIRED_CONSECUTIVE_HITS = 2;
 
 function playSubtleChime() {
   try {
@@ -66,15 +74,20 @@ export default function ActiveTripScreen({
   const [latestNotification, setLatestNotification] = useState(null);
   const [gpsState, setGpsState] = useState({
     status: mode === 'gps' ? 'searching' : 'inactive',
-    message: 'Buscando señal GPS de alta precisión...',
+    message: 'Buscando señal GPS precisa...',
     coords: null,
+    accuracy: null,
+    speed: null,
     nearestMeters: null,
     nearestName: null,
   });
+  const [gpsLogCount, setGpsLogCount] = useState(0);
 
   const tripStartRef = useRef(new Date());
   const crossedIdsRef = useRef(new Set());
   const crossedListRef = useRef([]);
+  const consecutiveHitsRef = useRef(new Map());
+  const gpsDebugLogRef = useRef([]);
   const finishedRef = useRef(false);
 
   const horarioObj = useMemo(
@@ -240,15 +253,23 @@ export default function ActiveTripScreen({
     route.porticos,
   ]);
 
-  // Real GPS mode via navigator.geolocation
+  // Real GPS mode via navigator.geolocation (hardened accuracy + speed/consecutive hit filter)
   useEffect(() => {
     if (mode !== 'gps') return;
+
+    // Reset fresh diagnostic trace for this GPS trip
+    gpsDebugLogRef.current = [];
+    consecutiveHitsRef.current = new Map();
+    saveGpsDebugLog([]);
+    setGpsLogCount(0);
 
     if (!('geolocation' in navigator)) {
       setGpsState({
         status: 'error',
         message: 'Tu navegador no soporta geolocalización GPS.',
         coords: null,
+        accuracy: null,
+        speed: null,
         nearestMeters: null,
         nearestName: null,
       });
@@ -257,43 +278,120 @@ export default function ActiveTripScreen({
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
-        const { latitude, longitude, accuracy } = pos.coords;
-        let nearest = null;
+        const { latitude, longitude, accuracy, speed, heading } = pos.coords;
+        const safeAccuracy =
+          typeof accuracy === 'number' && Number.isFinite(accuracy)
+            ? accuracy
+            : null;
+        const safeSpeed =
+          typeof speed === 'number' && Number.isFinite(speed) && speed >= 0
+            ? speed
+            : null;
+        const safeHeading =
+          typeof heading === 'number' && Number.isFinite(heading) && heading >= 0
+            ? Math.round(heading)
+            : null;
 
-        route.porticos.forEach((p) => {
+        // Compute nearest uncrossed portico for telemetry and diagnostic logging
+        let nearest = null;
+        const distances = route.porticos.map((p) => {
           const dist = haversineDistanceMeters(latitude, longitude, p.lat, p.lng);
           if (!crossedIdsRef.current.has(p.id)) {
             if (!nearest || dist < nearest.dist) {
               nearest = { portico: p, dist };
             }
-            if (dist <= DETECTION_RADIUS_METERS) {
-              registerPortico(p);
-            }
           }
+          return { portico: p, dist };
         });
 
-        setGpsState({
-          status: 'active',
-          message: `GPS activo (±${Math.round(accuracy)} m)`,
-          coords: { lat: latitude, lng: longitude },
-          nearestMeters: nearest ? Math.round(nearest.dist) : null,
-          nearestName: nearest ? nearest.portico.nombre : 'Ruta completada',
-        });
+        let triggered = false;
+        const isLowAccuracy =
+          safeAccuracy === null || safeAccuracy > MAX_GPS_ACCURACY_METERS;
+
+        if (isLowAccuracy) {
+          // Ignore cell/Wi-Fi triangulation jumps (> 65m); reset consecutive counters
+          consecutiveHitsRef.current.clear();
+
+          setGpsState((prev) => ({
+            ...prev,
+            status: 'low_accuracy',
+            message: 'Buscando señal GPS precisa...',
+            accuracy: safeAccuracy !== null ? Math.round(safeAccuracy) : null,
+            speed: safeSpeed,
+          }));
+        } else {
+          // Valid high-accuracy reading (<= 65m): evaluate 90m portico radius
+          const isMovingFast =
+            safeSpeed !== null && safeSpeed > MIN_SPEED_MPS;
+          const isStationaryAtLight =
+            safeSpeed !== null && safeSpeed < 1;
+
+          distances.forEach(({ portico: p, dist }) => {
+            if (crossedIdsRef.current.has(p.id)) return;
+
+            if (dist <= DETECTION_RADIUS_METERS) {
+              const hits = (consecutiveHitsRef.current.get(p.id) || 0) + 1;
+              consecutiveHitsRef.current.set(p.id, hits);
+
+              // Trigger if moving > 3 m/s (~11 km/h), OR if >= 2 consecutive readings
+              // when speed isn't reported (or moving slowly in highway traffic, not stopped)
+              const confirmedCrossing =
+                isMovingFast ||
+                (!isStationaryAtLight && hits >= REQUIRED_CONSECUTIVE_HITS);
+
+              if (confirmedCrossing) {
+                registerPortico(p);
+                consecutiveHitsRef.current.delete(p.id);
+                triggered = true;
+              }
+            } else {
+              consecutiveHitsRef.current.delete(p.id);
+            }
+          });
+
+          setGpsState({
+            status: 'active',
+            message: `GPS preciso activo (±${Math.round(safeAccuracy)} m)`,
+            coords: { lat: latitude, lng: longitude },
+            accuracy: Math.round(safeAccuracy),
+            speed: safeSpeed,
+            nearestMeters: nearest ? Math.round(nearest.dist) : null,
+            nearestName: nearest ? nearest.portico.nombre : 'Ruta completada',
+          });
+        }
+
+        // Persist every GPS reading to memory + localStorage for field diagnostics
+        const logEntry = {
+          timestamp: new Date(pos.timestamp || Date.now()).toISOString(),
+          lat: Number(latitude.toFixed(7)),
+          lng: Number(longitude.toFixed(7)),
+          accuracy:
+            safeAccuracy !== null ? Number(safeAccuracy.toFixed(1)) : null,
+          speed: safeSpeed !== null ? Number(safeSpeed.toFixed(2)) : null,
+          heading: safeHeading,
+          nearestPorticoId: nearest ? nearest.portico.id : null,
+          distanceMeters: nearest ? Math.round(nearest.dist) : null,
+          triggered,
+        };
+
+        gpsDebugLogRef.current.push(logEntry);
+        saveGpsDebugLog(gpsDebugLogRef.current);
+        setGpsLogCount(gpsDebugLogRef.current.length);
       },
       (err) => {
         const msg =
           err.code === 1
             ? 'Permiso de ubicación denegado. Habilita el GPS o usa paso manual.'
-            : 'No se pudo obtener señal GPS en este momento.';
+            : 'Buscando señal GPS precisa...';
         setGpsState((prev) => ({
           ...prev,
-          status: 'error',
+          status: err.code === 1 ? 'error' : 'low_accuracy',
           message: msg,
         }));
       },
       {
         enableHighAccuracy: true,
-        maximumAge: 3000,
+        maximumAge: 0,
         timeout: 10000,
       }
     );
@@ -466,35 +564,84 @@ export default function ActiveTripScreen({
       <div className="px-4 -mt-3 space-y-3.5 flex-1">
         {/* Mode banner: GPS Radar or Simulation status */}
         {mode === 'gps' ? (
-          <div className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-slate-900/5 flex items-start gap-3">
-            <div className="relative w-10 h-10 rounded-xl bg-emerald-50 text-[#1E7E53] flex items-center justify-center shrink-0">
-              <Navigation className="w-5 h-5" />
-              {gpsState.status === 'active' && (
-                <span className="absolute inset-0 rounded-xl border-2 border-[#1E7E53]/40 animate-pulse-ring" />
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <Signal className="w-3.5 h-3.5 text-[#1E7E53]" />
-                  {gpsState.message}
-                </p>
+          <div className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-slate-900/5 space-y-2.5">
+            <div className="flex items-start gap-3">
+              <div
+                className={`relative w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                  gpsState.status === 'low_accuracy' || gpsState.status === 'searching'
+                    ? 'bg-amber-50 text-amber-600'
+                    : gpsState.status === 'error'
+                    ? 'bg-red-50 text-red-600'
+                    : 'bg-emerald-50 text-[#1E7E53]'
+                }`}
+              >
+                <Navigation className="w-5 h-5" />
+                {gpsState.status === 'active' && (
+                  <span className="absolute inset-0 rounded-xl border-2 border-[#1E7E53]/40 animate-pulse-ring" />
+                )}
               </div>
-              {gpsState.nearestMeters !== null ? (
-                <p className="text-[11.5px] text-slate-500 mt-1">
-                  Próximo pórtico: <strong className="text-slate-800">{gpsState.nearestName}</strong> a{' '}
-                  <span className="tabular-nums font-semibold">
-                    {gpsState.nearestMeters >= 1000
-                      ? `${(gpsState.nearestMeters / 1000).toFixed(1).replace('.', ',')} km`
-                      : `${gpsState.nearestMeters} m`}
-                  </span>{' '}
-                  (radio {DETECTION_RADIUS_METERS} m)
-                </p>
-              ) : (
-                <p className="text-[11.5px] text-slate-500 mt-1">
-                  Si estás probando en interior sin desplazarte, puedes registrar el siguiente pórtico manualmente abajo.
-                </p>
-              )}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <Signal
+                      className={`w-3.5 h-3.5 ${
+                        gpsState.status === 'low_accuracy' || gpsState.status === 'searching'
+                          ? 'text-amber-500'
+                          : gpsState.status === 'error'
+                          ? 'text-red-500'
+                          : 'text-[#1E7E53]'
+                      }`}
+                    />
+                    {gpsState.message}
+                  </p>
+                  {gpsState.speed !== null && gpsState.status === 'active' && (
+                    <span className="text-[10.5px] font-bold text-slate-500 tabular-nums shrink-0">
+                      {Math.round(gpsState.speed * 3.6)} km/h
+                    </span>
+                  )}
+                </div>
+
+                {gpsState.status === 'low_accuracy' ? (
+                  <p className="text-[11px] text-amber-700 mt-1 leading-snug">
+                    Precisión actual baja
+                    {gpsState.accuracy ? ` (±${gpsState.accuracy} m)` : ''}. Esperando señal ≤{' '}
+                    {MAX_GPS_ACCURACY_METERS} m para evitar falsos cobros.
+                  </p>
+                ) : gpsState.nearestMeters !== null ? (
+                  <p className="text-[11.5px] text-slate-500 mt-1">
+                    Próximo pórtico:{' '}
+                    <strong className="text-slate-800">{gpsState.nearestName}</strong> a{' '}
+                    <span className="tabular-nums font-semibold">
+                      {gpsState.nearestMeters >= 1000
+                        ? `${(gpsState.nearestMeters / 1000).toFixed(1).replace('.', ',')} km`
+                        : `${gpsState.nearestMeters} m`}
+                    </span>{' '}
+                    (radio {DETECTION_RADIUS_METERS} m)
+                  </p>
+                ) : (
+                  <p className="text-[11.5px] text-slate-500 mt-1">
+                    Radio de detección: {DETECTION_RADIUS_METERS} m · Precisión requerida ≤{' '}
+                    {MAX_GPS_ACCURACY_METERS} m.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Discreet downloadable GPS diagnostic log button */}
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+              <span className="text-[10.5px] text-slate-400 tabular-nums">
+                Diagnóstico GPS · {gpsLogCount}{' '}
+                {gpsLogCount === 1 ? 'lectura' : 'lecturas'}
+              </span>
+              <button
+                type="button"
+                onClick={() => downloadGpsDebugLog(gpsDebugLogRef.current)}
+                disabled={gpsLogCount === 0}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-45 text-slate-700 text-[10.5px] font-semibold transition cursor-pointer"
+              >
+                <Download className="w-3 h-3" />
+                Descargar Log GPS (JSON)
+              </button>
             </div>
           </div>
         ) : (
@@ -553,6 +700,22 @@ export default function ActiveTripScreen({
                   ...crossedPorticos,
                   ...route.porticos
                     .filter((item) => !crossedPorticos.some((c) => c.id === item.id))
+                    .sort((a, b) => {
+                      if (!gpsState.coords) return 0;
+                      const da = haversineDistanceMeters(
+                        gpsState.coords.lat,
+                        gpsState.coords.lng,
+                        a.lat,
+                        a.lng
+                      );
+                      const db = haversineDistanceMeters(
+                        gpsState.coords.lat,
+                        gpsState.coords.lng,
+                        b.lat,
+                        b.lng
+                      );
+                      return da - db;
+                    })
                     .slice(0, 4),
                 ]
               : route.porticos

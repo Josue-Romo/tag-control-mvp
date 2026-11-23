@@ -3,7 +3,7 @@
     "ciudad": "Santiago de Chile",
     "moneda": "CLP",
     "versionTarifas": "Oficial 2026 (Categoría 1 y 4 - Auto / Camioneta)",
-    "radioDeteccionMetros": 250
+    "radioDeteccionMetros": 90
   },
   "horarios": [
     {

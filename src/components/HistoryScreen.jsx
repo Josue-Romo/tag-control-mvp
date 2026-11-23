@@ -16,6 +16,10 @@ import {
   getBudgetStatus,
 } from '../utils/format';
 import { getSavedAlertLeads, getTrackedEvents } from '../utils/analytics';
+import {
+  downloadGpsDebugLog,
+  loadGpsDebugLog,
+} from '../utils/gpsDebugLog';
 import AlertCaptureCard from './AlertCaptureCard';
 import PorticoIcon from './PorticoIcon';
 
@@ -38,6 +42,7 @@ export default function HistoryScreen({
   const status = getBudgetStatus(monthlySpent, config.monthlyBudget);
   const events = getTrackedEvents();
   const leads = getSavedAlertLeads();
+  const gpsLogs = loadGpsDebugLog();
 
   const handleExportValidationData = () => {
     const payload = {
@@ -198,11 +203,28 @@ export default function HistoryScreen({
         </section>
 
         {/* Discreet P2 Field Test Diagnostics */}
-        <section className="pt-2">
+        <section className="pt-2 space-y-2">
+          <div className="flex items-center justify-center">
+            <button
+              type="button"
+              onClick={() => downloadGpsDebugLog(gpsLogs)}
+              disabled={gpsLogs.length === 0}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200/90 hover:bg-slate-50 disabled:opacity-45 text-slate-600 text-[11px] font-semibold shadow-2xs transition cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 text-[#1E7E53]" />
+              Descargar Log GPS (JSON)
+              {gpsLogs.length > 0 && (
+                <span className="text-slate-400 tabular-nums">
+                  ({gpsLogs.length})
+                </span>
+              )}
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={() => setShowMetricsDrawer((v) => !v)}
-            className="w-full py-2 text-[11px] font-medium text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5 transition cursor-pointer"
+            className="w-full py-1.5 text-[11px] font-medium text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5 transition cursor-pointer"
           >
             <Terminal className="w-3.5 h-3.5" />
             Métricas de validación P2 ({events.length} eventos · {leads.length} registros)

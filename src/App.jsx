@@ -188,6 +188,7 @@ export default function App() {
     localStorage.removeItem('tag_control_trips_v1');
     localStorage.removeItem('tag_control_analytics_events');
     localStorage.removeItem('tag_control_alert_leads');
+    localStorage.removeItem('tag_control_gps_debug_log');
     const freshTrips = loadTrips();
     setConfig(DEFAULT_CONFIG);
     setTrips(freshTrips);

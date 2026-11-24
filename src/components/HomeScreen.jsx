@@ -60,6 +60,11 @@ export default function HomeScreen({
     0
   );
 
+  const totalNetworkPorticos = porticosData.rutas.reduce(
+    (sum, r) => sum + r.porticos.length,
+    0
+  );
+
   const monthName = now.toLocaleDateString('es-CL', { month: 'long' });
   const monthLabel = monthName.charAt(0).toUpperCase() + monthName.slice(1);
 
@@ -244,6 +249,9 @@ export default function HomeScreen({
             <p className="text-[12.5px] text-emerald-50/95 leading-relaxed mt-3 text-center">
               Detecta automáticamente tus pórticos, autopistas y tarifa horaria
               mientras conduces, sin configuración manual.
+            </p>
+            <p className="text-[11px] font-semibold text-emerald-100/85 mt-2 text-center tabular-nums">
+              Red RM activa · {totalNetworkPorticos} pórticos en ambos sentidos
             </p>
           </div>
         </section>

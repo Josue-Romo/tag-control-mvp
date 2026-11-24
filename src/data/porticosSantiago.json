@@ -2,8 +2,10 @@
   "metadata": {
     "ciudad": "Santiago de Chile",
     "moneda": "CLP",
-    "versionTarifas": "Oficial 2026 (Categoría 1 y 4 - Auto / Camioneta)",
-    "radioDeteccionMetros": 90
+    "versionTarifas": "Oficial 2026 (Categoría 1 y 4 · Red Completa Ambos Sentidos)",
+    "radioDeteccionMetros": 90,
+    "toleranciaRumboGrados": 75,
+    "totalPorticos": 94
   },
   "horarios": [
     {
@@ -30,23 +32,60 @@
   ],
   "rutas": [
     {
-      "id": "vespucio-norte-ruta5",
-      "nombre": "Eje Vespucio Norte",
-      "nombreCorto": "Vespucio Norte",
-      "descripcion": "Ruta 68 · Lo Echevers · Ruta 5 Norte · El Salto",
+      "id": "vespucio-norte-po",
+      "nombre": "Vespucio Norte · Poniente – Oriente",
+      "nombreCorto": "Vespucio Norte (P→O)",
+      "descripcion": "Ruta 78 · Ruta 68 · Lo Echevers · El Salto",
       "concesionarias": "Autopista Vespucio Norte",
-      "distanciaTotalKm": 21.3,
-      "duracionEstimadaMin": 26,
+      "distanciaTotalKm": 29,
+      "duracionEstimadaMin": 33,
       "porticos": [
+        {
+          "id": "vn-p1",
+          "codigo": "P1",
+          "nombre": "Pórtico Ruta 78 – Santa Elena",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.483359,
+          "lng": -70.7530939,
+          "heading": 335,
+          "osmNodeId": 4455202302,
+          "distanciaKm": 1.2,
+          "duracionMin": 1,
+          "tarifas": {
+            "fuera_punta": 121,
+            "punta": 241,
+            "saturacion": 362
+          }
+        },
+        {
+          "id": "vn-p16",
+          "codigo": "P16",
+          "nombre": "Pórtico Santa Elena – Ruta 68",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4512133,
+          "lng": -70.772985,
+          "heading": 315,
+          "osmNodeId": 9611695678,
+          "distanciaKm": 4.8,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 482,
+            "punta": 965,
+            "saturacion": 1447
+          }
+        },
         {
           "id": "vn-p3",
           "codigo": "P3",
           "nombre": "Pórtico Ruta 68 – Costanera Norte",
           "autopista": "Autopista Vespucio Norte",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "Pudahuel",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.4387137,
           "lng": -70.7831378,
+          "heading": 330,
+          "osmNodeId": 13877100,
           "distanciaKm": 3.5,
           "duracionMin": 4,
           "tarifas": {
@@ -60,10 +99,11 @@
           "codigo": "P5",
           "nombre": "Pórtico Costanera Norte – Condell",
           "autopista": "Autopista Vespucio Norte",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "Renca",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.3996244,
           "lng": -70.7756381,
+          "heading": 44,
+          "osmNodeId": 6116371481,
           "distanciaKm": 4.5,
           "duracionMin": 5,
           "tarifas": {
@@ -73,16 +113,35 @@
           }
         },
         {
+          "id": "vn-p7",
+          "codigo": "P7",
+          "nombre": "Pórtico Condell – Lo Echevers",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.38132,
+          "lng": -70.7539367,
+          "heading": 44,
+          "osmNodeId": 6117130675,
+          "distanciaKm": 1.04,
+          "duracionMin": 1,
+          "tarifas": {
+            "fuera_punta": 105,
+            "punta": 209,
+            "saturacion": 209
+          }
+        },
+        {
           "id": "vn-p9",
           "codigo": "P9",
           "nombre": "Pórtico Lo Echevers – Ruta 5 Norte",
           "autopista": "Autopista Vespucio Norte",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "Quilicura",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.3688771,
           "lng": -70.7043428,
+          "heading": 52,
+          "osmNodeId": 6117130673,
           "distanciaKm": 5.46,
-          "duracionMin": 7,
+          "duracionMin": 6,
           "tarifas": {
             "fuera_punta": 549,
             "punta": 1097,
@@ -94,12 +153,13 @@
           "codigo": "P10",
           "nombre": "Pórtico Ruta 5 Norte – Pedro Fontova",
           "autopista": "Autopista Vespucio Norte",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "Huechuraba",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.3659479,
           "lng": -70.6969041,
+          "heading": 90,
+          "osmNodeId": 6117130672,
           "distanciaKm": 3,
-          "duracionMin": 4,
+          "duracionMin": 3,
           "tarifas": {
             "fuera_punta": 301,
             "punta": 603,
@@ -107,14 +167,33 @@
           }
         },
         {
+          "id": "vn-p12",
+          "codigo": "P12",
+          "nombre": "Pórtico Pedro Fontova – Guanaco",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.3733937,
+          "lng": -70.6649728,
+          "heading": 114,
+          "osmNodeId": 6117130669,
+          "distanciaKm": 0.69,
+          "duracionMin": 1,
+          "tarifas": {
+            "fuera_punta": 69,
+            "punta": 139,
+            "saturacion": 139
+          }
+        },
+        {
           "id": "vn-p14",
           "codigo": "P14",
           "nombre": "Pórtico Guanaco – El Salto",
           "autopista": "Autopista Vespucio Norte",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "Huechuraba",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.3886039,
           "lng": -70.6333164,
+          "heading": 131,
+          "osmNodeId": 13881069,
           "distanciaKm": 4.81,
           "duracionMin": 6,
           "tarifas": {
@@ -126,23 +205,233 @@
       ]
     },
     {
-      "id": "costanera-norte",
-      "nombre": "Eje Costanera Norte",
-      "nombreCorto": "Costanera Norte",
-      "descripcion": "Centenario · Lo Saldes · Vivaceta · Ruta 68",
-      "concesionarias": "Autopista Costanera Norte",
-      "distanciaTotalKm": 24.3,
-      "duracionEstimadaMin": 29,
+      "id": "vespucio-norte-op",
+      "nombre": "Vespucio Norte · Oriente – Poniente",
+      "nombreCorto": "Vespucio Norte (O→P)",
+      "descripcion": "El Salto · Pedro Fontova · Condell · Ruta 78",
+      "concesionarias": "Autopista Vespucio Norte",
+      "distanciaTotalKm": 29,
+      "duracionEstimadaMin": 32,
       "porticos": [
         {
-          "id": "cn-p2-2",
+          "id": "vn-p15",
+          "codigo": "P15",
+          "nombre": "Pórtico El Salto – Recoleta",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.3886636,
+          "lng": -70.6329673,
+          "heading": 311,
+          "osmNodeId": 6117130668,
+          "distanciaKm": 1.4,
+          "duracionMin": 2,
+          "tarifas": {
+            "fuera_punta": 141,
+            "punta": 281,
+            "saturacion": 422
+          }
+        },
+        {
+          "id": "vn-p13",
+          "codigo": "P13",
+          "nombre": "Pórtico Recoleta – Pedro Fontova",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.3733644,
+          "lng": -70.6646148,
+          "heading": 294,
+          "osmNodeId": 6117130670,
+          "distanciaKm": 4.1,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 412,
+            "punta": 824,
+            "saturacion": 1236
+          }
+        },
+        {
+          "id": "vn-p11",
+          "codigo": "P11",
+          "nombre": "Pórtico Pedro Fontova – Ruta 5 Norte",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.3658211,
+          "lng": -70.6951137,
+          "heading": 270,
+          "osmNodeId": 6117130671,
+          "distanciaKm": 3,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 301,
+            "punta": 603,
+            "saturacion": 603
+          }
+        },
+        {
+          "id": "vn-p8",
+          "codigo": "P8",
+          "nombre": "Pórtico Ruta 5 Norte – Condell",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.3730357,
+          "lng": -70.7113029,
+          "heading": 237,
+          "osmNodeId": 6117130674,
+          "distanciaKm": 6.5,
+          "duracionMin": 7,
+          "tarifas": {
+            "fuera_punta": 653,
+            "punta": 1306,
+            "saturacion": 1306
+          }
+        },
+        {
+          "id": "vn-p6",
+          "codigo": "P6",
+          "nombre": "Pórtico Condell – Costanera Norte",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.3993533,
+          "lng": -70.7755638,
+          "heading": 225,
+          "osmNodeId": 6116371480,
+          "distanciaKm": 4.5,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 452,
+            "punta": 904,
+            "saturacion": 904
+          }
+        },
+        {
+          "id": "vn-p4",
+          "codigo": "P4",
+          "nombre": "Pórtico Costanera Norte – Ruta 68",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4312884,
+          "lng": -70.7848507,
+          "heading": 191,
+          "osmNodeId": 6116371482,
+          "distanciaKm": 3.5,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 352,
+            "punta": 703,
+            "saturacion": 1055
+          }
+        },
+        {
+          "id": "vn-p2",
+          "codigo": "P2",
+          "nombre": "Pórtico Ruta 68 – Los Mares",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4563798,
+          "lng": -70.7671522,
+          "heading": 136,
+          "osmNodeId": 9611695677,
+          "distanciaKm": 2.1,
+          "duracionMin": 2,
+          "tarifas": {
+            "fuera_punta": 211,
+            "punta": 422,
+            "saturacion": 633
+          }
+        },
+        {
+          "id": "vn-p17",
+          "codigo": "P17",
+          "nombre": "Pórtico Los Mares – Ruta 78",
+          "autopista": "Autopista Vespucio Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4828675,
+          "lng": -70.7535733,
+          "heading": 154,
+          "osmNodeId": 5521500757,
+          "distanciaKm": 3.9,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 392,
+            "punta": 784,
+            "saturacion": 1176
+          }
+        }
+      ]
+    },
+    {
+      "id": "costanera-norte-op",
+      "nombre": "Costanera Norte · Oriente – Poniente",
+      "nombreCorto": "Costanera Norte (O→P)",
+      "descripcion": "Padre Arteaga · Lo Saldes · Vivaceta · Ruta 68 + Kennedy",
+      "concesionarias": "Autopista Costanera Norte",
+      "distanciaTotalKm": 54.8,
+      "duracionEstimadaMin": 65,
+      "porticos": [
+        {
+          "id": "cn-p0-op",
+          "codigo": "P0",
+          "nombre": "Pórtico Puente Padre Arteaga – Puente San Francisco",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.3710033,
+          "lng": -70.52258,
+          "heading": 245,
+          "osmNodeId": 253434286,
+          "distanciaKm": 1.4,
+          "duracionMin": 2,
+          "tarifas": {
+            "fuera_punta": 150,
+            "punta": 288,
+            "saturacion": 437
+          }
+        },
+        {
+          "id": "cn-p1-op",
+          "codigo": "P1",
+          "nombre": "Pórtico Puente San Francisco – Gran Vía",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.3758198,
+          "lng": -70.5426489,
+          "heading": 301,
+          "osmNodeId": 2951662070,
+          "distanciaKm": 4.2,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 449,
+            "punta": 865,
+            "saturacion": 1310
+          }
+        },
+        {
+          "id": "cn-p2-1-op",
+          "codigo": "P2.1",
+          "nombre": "Pórtico Gran Vía – Centenario",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.3846042,
+          "lng": -70.5926964,
+          "heading": 226,
+          "osmNodeId": 9627393148,
+          "distanciaKm": 3.98,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 426,
+            "punta": 820,
+            "saturacion": 1242
+          }
+        },
+        {
+          "id": "cn-p2-2-op",
           "codigo": "P2.2",
           "nombre": "Pórtico Centenario – Puente Lo Saldes",
           "autopista": "Autopista Costanera Norte",
-          "sentido": "Sentido Oriente - Poniente",
-          "comuna": "Vitacura",
+          "sentido": "Sentido Oriente – Poniente",
           "lat": -33.3944093,
           "lng": -70.6035262,
+          "heading": 207,
+          "osmNodeId": 6117130667,
           "distanciaKm": 2.47,
           "duracionMin": 3,
           "tarifas": {
@@ -152,14 +441,33 @@
           }
         },
         {
-          "id": "cn-p3",
+          "id": "cn-sb",
+          "codigo": "SB",
+          "nombre": "Pórtico Salida Bellavista",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4221473,
+          "lng": -70.6198252,
+          "heading": 239,
+          "osmNodeId": 9516346638,
+          "distanciaKm": 2.19,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 234,
+            "punta": 450,
+            "saturacion": 682
+          }
+        },
+        {
+          "id": "cn-p3-op",
           "codigo": "P3",
           "nombre": "Pórtico Puente Lo Saldes – Vivaceta",
           "autopista": "Autopista Costanera Norte",
-          "sentido": "Sentido Oriente - Poniente",
-          "comuna": "Independencia",
+          "sentido": "Sentido Oriente – Poniente",
           "lat": -33.4239919,
           "lng": -70.6219547,
+          "heading": 221,
+          "osmNodeId": 9638303965,
           "distanciaKm": 6.72,
           "duracionMin": 8,
           "tarifas": {
@@ -169,14 +477,51 @@
           }
         },
         {
-          "id": "cn-p5",
+          "id": "cn-ep",
+          "codigo": "EP",
+          "nombre": "Pórtico Entrada Purísima",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4345202,
+          "lng": -70.6405623,
+          "heading": 277,
+          "osmNodeId": 7953199984,
+          "distanciaKm": 2.11,
+          "duracionMin": 2,
+          "tarifas": {
+            "fuera_punta": 226,
+            "punta": 435,
+            "saturacion": 658
+          }
+        },
+        {
+          "id": "cn-ev",
+          "codigo": "EV",
+          "nombre": "Pórtico Entrada Vivaceta",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4302801,
+          "lng": -70.6572269,
+          "heading": 282,
+          "osmNodeId": 6116236796,
+          "distanciaKm": 1.12,
+          "duracionMin": 1,
+          "tarifas": {
+            "fuera_punta": 119,
+            "punta": 230,
+            "saturacion": 348
+          }
+        },
+        {
+          "id": "cn-p5-op",
           "codigo": "P5",
           "nombre": "Pórtico Vivaceta – Carrascal",
           "autopista": "Autopista Costanera Norte",
-          "sentido": "Sentido Oriente - Poniente",
-          "comuna": "Quinta Normal",
+          "sentido": "Sentido Oriente – Poniente",
           "lat": -33.4264381,
           "lng": -70.669833,
+          "heading": 295,
+          "osmNodeId": 2612857718,
           "distanciaKm": 6.69,
           "duracionMin": 8,
           "tarifas": {
@@ -186,14 +531,33 @@
           }
         },
         {
-          "id": "cn-p6-2",
+          "id": "cn-p6-1-op",
+          "codigo": "P6.1",
+          "nombre": "Pórtico Carrascal – Petersen",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4117097,
+          "lng": -70.7395811,
+          "heading": 269,
+          "osmNodeId": 9641637789,
+          "distanciaKm": 2.24,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 240,
+            "punta": 461,
+            "saturacion": 461
+          }
+        },
+        {
+          "id": "cn-p6-2-op",
           "codigo": "P6.2",
           "nombre": "Pórtico Petersen – Américo Vespucio Poniente",
           "autopista": "Autopista Costanera Norte",
-          "sentido": "Sentido Oriente - Poniente",
-          "comuna": "Cerro Navia",
+          "sentido": "Sentido Oriente – Poniente",
           "lat": -33.4129722,
           "lng": -70.7664565,
+          "heading": 274,
+          "osmNodeId": 6509152133,
           "distanciaKm": 3.41,
           "duracionMin": 4,
           "tarifas": {
@@ -203,14 +567,15 @@
           }
         },
         {
-          "id": "cn-p9",
+          "id": "cn-p9-op",
           "codigo": "P9",
           "nombre": "Pórtico Américo Vespucio Poniente – Ruta 68",
           "autopista": "Autopista Costanera Norte",
-          "sentido": "Sentido Oriente - Poniente",
-          "comuna": "Pudahuel",
+          "sentido": "Sentido Oriente – Poniente",
           "lat": -33.4178581,
           "lng": -70.7908552,
+          "heading": 234,
+          "osmNodeId": 6508970707,
           "distanciaKm": 5,
           "duracionMin": 6,
           "tarifas": {
@@ -218,27 +583,543 @@
             "punta": 1030,
             "saturacion": 1560
           }
+        },
+        {
+          "id": "cn-p7-eo",
+          "codigo": "P7-EO",
+          "nombre": "Eje Kennedy: Estoril – Las Tranqueras",
+          "autopista": "Costanera Norte · Eje Kennedy",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.3876805,
+          "lng": -70.5429258,
+          "heading": 244,
+          "osmNodeId": 2486323474,
+          "distanciaKm": 2.34,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 250,
+            "punta": 482,
+            "saturacion": 730
+          }
+        },
+        {
+          "id": "cn-p8-0-eo",
+          "codigo": "P8.0-EO",
+          "nombre": "Eje Kennedy: Las Tranqueras – Costanera Norte (P8.0)",
+          "autopista": "Costanera Norte · Eje Kennedy",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4080729,
+          "lng": -70.599764,
+          "heading": 269,
+          "osmNodeId": 5579887517,
+          "distanciaKm": 5.46,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 584,
+            "punta": 1124,
+            "saturacion": 1702
+          }
+        },
+        {
+          "id": "cn-p8-1-eo",
+          "codigo": "P8.1-EO",
+          "nombre": "Eje Kennedy: Las Tranqueras – Costanera Norte (P8.1)",
+          "autopista": "Costanera Norte · Eje Kennedy",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4081406,
+          "lng": -70.5997632,
+          "heading": 268,
+          "osmNodeId": 3241339769,
+          "distanciaKm": 5.46,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 584,
+            "punta": 1124,
+            "saturacion": 1702
+          }
         }
       ]
     },
     {
-      "id": "autopista-central",
-      "nombre": "Autopista Central · Eje General Velásquez",
-      "nombreCorto": "Autopista Central",
-      "descripcion": "Ruta 5 Sur · Alameda · Río Mapocho · Ruta 5 Norte",
-      "concesionarias": "Autopista Central (Eje General Velásquez)",
-      "distanciaTotalKm": 20.7,
-      "duracionEstimadaMin": 26,
+      "id": "costanera-norte-po",
+      "nombre": "Costanera Norte · Poniente – Oriente",
+      "nombreCorto": "Costanera Norte (P→O)",
+      "descripcion": "Ruta 68 · Carrascal · Tajamar · Padre Arteaga + Kennedy",
+      "concesionarias": "Autopista Costanera Norte",
+      "distanciaTotalKm": 60.3,
+      "duracionEstimadaMin": 70,
       "porticos": [
+        {
+          "id": "cn-p9-po",
+          "codigo": "P9-PO",
+          "nombre": "Pórtico Ruta 68 – Américo Vespucio Poniente",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.418078,
+          "lng": -70.7910033,
+          "heading": 54,
+          "osmNodeId": 6508970705,
+          "distanciaKm": 5,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 535,
+            "punta": 1030,
+            "saturacion": 1030
+          }
+        },
+        {
+          "id": "cn-p6-2-po",
+          "codigo": "P6.2-PO",
+          "nombre": "Pórtico Américo Vespucio Poniente – Petersen",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4130639,
+          "lng": -70.7667427,
+          "heading": 93,
+          "osmNodeId": 6509152132,
+          "distanciaKm": 3.41,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 365,
+            "punta": 702,
+            "saturacion": 1064
+          }
+        },
+        {
+          "id": "cn-p6-1-po",
+          "codigo": "P6.1-PO",
+          "nombre": "Pórtico Petersen – Carrascal",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.411826,
+          "lng": -70.7395828,
+          "heading": 89,
+          "osmNodeId": 9641637788,
+          "distanciaKm": 2.24,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 240,
+            "punta": 461,
+            "saturacion": 699
+          }
+        },
+        {
+          "id": "cn-p5-po",
+          "codigo": "P5-PO",
+          "nombre": "Pórtico Carrascal – Vivaceta",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.426442,
+          "lng": -70.6701402,
+          "heading": 115,
+          "osmNodeId": 5572951836,
+          "distanciaKm": 6.69,
+          "duracionMin": 8,
+          "tarifas": {
+            "fuera_punta": 716,
+            "punta": 1378,
+            "saturacion": 2087
+          }
+        },
+        {
+          "id": "cn-p4-po",
+          "codigo": "P4",
+          "nombre": "Pórtico Vivaceta – Torres Tajamar",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4302245,
+          "lng": -70.6579611,
+          "heading": 117,
+          "osmNodeId": 6116236797,
+          "distanciaKm": 3.86,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 413,
+            "punta": 795,
+            "saturacion": 1204
+          }
+        },
+        {
+          "id": "cn-p3-po",
+          "codigo": "P3-PO",
+          "nombre": "Pórtico Torres Tajamar – Puente Lo Saldes",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4241131,
+          "lng": -70.6218108,
+          "heading": 40,
+          "osmNodeId": 9638303963,
+          "distanciaKm": 2.86,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 306,
+            "punta": 589,
+            "saturacion": 892
+          }
+        },
+        {
+          "id": "cn-p2-2-po",
+          "codigo": "P2.2-PO",
+          "nombre": "Pórtico Puente Lo Saldes – Centenario",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.3944443,
+          "lng": -70.6033861,
+          "heading": 27,
+          "osmNodeId": 2948768935,
+          "distanciaKm": 2.47,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 264,
+            "punta": 509,
+            "saturacion": 771
+          }
+        },
+        {
+          "id": "cn-p2-1-po",
+          "codigo": "P2.1-PO",
+          "nombre": "Pórtico Centenario – Gran Vía",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.3846827,
+          "lng": -70.5926045,
+          "heading": 46,
+          "osmNodeId": 9627393149,
+          "distanciaKm": 3.98,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 426,
+            "punta": 820,
+            "saturacion": 1242
+          }
+        },
+        {
+          "id": "cn-p1-po",
+          "codigo": "P1-PO",
+          "nombre": "Pórtico Gran Vía – Puente San Francisco",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.3757292,
+          "lng": -70.5430603,
+          "heading": 122,
+          "osmNodeId": 6117141442,
+          "distanciaKm": 4.2,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 449,
+            "punta": 865,
+            "saturacion": 1310
+          }
+        },
+        {
+          "id": "cn-p0-po",
+          "codigo": "P0-PO",
+          "nombre": "Pórtico Puente San Francisco – Puente Padre Arteaga",
+          "autopista": "Autopista Costanera Norte",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.3712087,
+          "lng": -70.5229107,
+          "heading": 74,
+          "osmNodeId": 9626675441,
+          "distanciaKm": 1.4,
+          "duracionMin": 2,
+          "tarifas": {
+            "fuera_punta": 150,
+            "punta": 288,
+            "saturacion": 437
+          }
+        },
+        {
+          "id": "cn-p8-3-po",
+          "codigo": "P8.3",
+          "nombre": "Eje Kennedy: Costanera Norte – Las Tranqueras (P8.3)",
+          "autopista": "Costanera Norte · Eje Kennedy",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4024008,
+          "lng": -70.5816916,
+          "heading": 63,
+          "osmNodeId": 9695367765,
+          "distanciaKm": 5.46,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 584,
+            "punta": 1124,
+            "saturacion": 1702
+          }
+        },
+        {
+          "id": "cn-p8-2-po",
+          "codigo": "P8.2",
+          "nombre": "Eje Kennedy: Costanera Norte – Las Tranqueras (P8.2)",
+          "autopista": "Costanera Norte · Eje Kennedy",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4084907,
+          "lng": -70.6019447,
+          "heading": 83,
+          "osmNodeId": 9515321517,
+          "distanciaKm": 5.46,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 584,
+            "punta": 1124,
+            "saturacion": 1702
+          }
+        },
+        {
+          "id": "cn-p8-1-po",
+          "codigo": "P8.1-PO",
+          "nombre": "Eje Kennedy: Costanera Norte – Las Tranqueras (P8.1)",
+          "autopista": "Costanera Norte · Eje Kennedy",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4090708,
+          "lng": -70.6038986,
+          "heading": 63,
+          "osmNodeId": 5788252531,
+          "distanciaKm": 5.46,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 584,
+            "punta": 1124,
+            "saturacion": 1702
+          }
+        },
+        {
+          "id": "cn-p8-0-po",
+          "codigo": "P8.0-PO",
+          "nombre": "Eje Kennedy: Costanera Norte – Las Tranqueras (P8.0)",
+          "autopista": "Costanera Norte · Eje Kennedy",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.40909,
+          "lng": -70.6043271,
+          "heading": 67,
+          "osmNodeId": 5788252112,
+          "distanciaKm": 5.46,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 584,
+            "punta": 1124,
+            "saturacion": 1702
+          }
+        },
+        {
+          "id": "cn-p7-po",
+          "codigo": "P7-PO",
+          "nombre": "Eje Kennedy: Las Tranqueras – Estoril",
+          "autopista": "Costanera Norte · Eje Kennedy",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.3872062,
+          "lng": -70.5413721,
+          "heading": 66,
+          "osmNodeId": 6116282528,
+          "distanciaKm": 2.34,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 250,
+            "punta": 482,
+            "saturacion": 730
+          }
+        }
+      ]
+    },
+    {
+      "id": "autopista-central-sn",
+      "nombre": "Autopista Central · Sur – Norte",
+      "nombreCorto": "Autopista Central (S→N)",
+      "descripcion": "Norte–Sur + Gral. Velásquez · Los Guindos a Vespucio Norte",
+      "concesionarias": "Autopista Central",
+      "distanciaTotalKm": 61.9,
+      "duracionEstimadaMin": 72,
+      "porticos": [
+        {
+          "id": "ac-pa2",
+          "codigo": "PA2",
+          "nombre": "Pórtico Los Guindos – La Capilla",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Sur – Norte",
+          "lat": -33.6473389,
+          "lng": -70.7116107,
+          "heading": 13,
+          "osmNodeId": 335626019,
+          "distanciaKm": 7.68,
+          "duracionMin": 9,
+          "tarifas": {
+            "fuera_punta": 868,
+            "punta": 868,
+            "saturacion": 868
+          }
+        },
+        {
+          "id": "ac-pa3",
+          "codigo": "PA3",
+          "nombre": "Pórtico La Capilla – Colón",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Sur – Norte",
+          "lat": -33.6227591,
+          "lng": -70.7145696,
+          "heading": 353,
+          "osmNodeId": 6114286297,
+          "distanciaKm": 5.63,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 585,
+            "punta": 1170,
+            "saturacion": 1755
+          }
+        },
+        {
+          "id": "ac-pa5",
+          "codigo": "PA5",
+          "nombre": "Pórtico Colón – Las Acacias",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Sur – Norte",
+          "lat": -33.5827543,
+          "lng": -70.7138422,
+          "heading": 6,
+          "osmNodeId": 6114291823,
+          "distanciaKm": 3.22,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 335,
+            "punta": 669,
+            "saturacion": 1004
+          }
+        },
+        {
+          "id": "ac-pa7",
+          "codigo": "PA7",
+          "nombre": "Pórtico Las Acacias – Américo Vespucio",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Sur – Norte",
+          "lat": -33.5478986,
+          "lng": -70.6970069,
+          "heading": 53,
+          "osmNodeId": 2490264555,
+          "distanciaKm": 4.35,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 452,
+            "punta": 904,
+            "saturacion": 904
+          }
+        },
+        {
+          "id": "ac-pa30",
+          "codigo": "PA30",
+          "nombre": "Pórtico Américo Vespucio – Departamental",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Sur – Norte",
+          "lat": -33.5072881,
+          "lng": -70.6693191,
+          "heading": 23,
+          "osmNodeId": 6116371334,
+          "distanciaKm": 3.78,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 393,
+            "punta": 786,
+            "saturacion": 786
+          }
+        },
+        {
+          "id": "ac-pa10",
+          "codigo": "PA10",
+          "nombre": "Pórtico Departamental – Carlos Valdovinos",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Sur – Norte",
+          "lat": -33.4957722,
+          "lng": -70.6638989,
+          "heading": 21,
+          "osmNodeId": 6116371328,
+          "distanciaKm": 2.75,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 286,
+            "punta": 572,
+            "saturacion": 572
+          }
+        },
+        {
+          "id": "ac-pa31",
+          "codigo": "PA31",
+          "nombre": "Pórtico Carlos Valdovinos – Alameda",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Sur – Norte",
+          "lat": -33.469011,
+          "lng": -70.6562428,
+          "heading": 358,
+          "osmNodeId": 4399757534,
+          "distanciaKm": 3.55,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 369,
+            "punta": 738,
+            "saturacion": 1107
+          }
+        },
+        {
+          "id": "ac-pa13",
+          "codigo": "PA13",
+          "nombre": "Pórtico Alameda – Río Mapocho",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Sur – Norte",
+          "lat": -33.4489228,
+          "lng": -70.6595919,
+          "heading": 345,
+          "osmNodeId": 6114084135,
+          "distanciaKm": 1.75,
+          "duracionMin": 2,
+          "tarifas": {
+            "fuera_punta": 182,
+            "punta": 364,
+            "saturacion": 546
+          }
+        },
+        {
+          "id": "ac-pa16",
+          "codigo": "PA16",
+          "nombre": "Pórtico Río Mapocho – 14 de la Fama",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Sur – Norte",
+          "lat": -33.4171865,
+          "lng": -70.6787232,
+          "heading": 354,
+          "osmNodeId": 288057884,
+          "distanciaKm": 4.09,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 425,
+            "punta": 850,
+            "saturacion": 850
+          }
+        },
+        {
+          "id": "ac-pa17",
+          "codigo": "PA17",
+          "nombre": "Pórtico 14 de la Fama – A. Vespucio Norte",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Sur – Norte",
+          "lat": -33.3685816,
+          "lng": -70.6991042,
+          "heading": 340,
+          "osmNodeId": 2077631034,
+          "distanciaKm": 4.45,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 463,
+            "punta": 925,
+            "saturacion": 925
+          }
+        },
         {
           "id": "ac-pa19",
           "codigo": "PA19",
-          "nombre": "Pórtico Ruta 5 Sur – Américo Vespucio",
+          "nombre": "Gral. Velásquez: Ruta 5 Sur – Américo Vespucio",
           "autopista": "Autopista Central · Eje Gral. Velásquez",
-          "sentido": "Dirección Sur - Norte",
-          "comuna": "San Bernardo",
+          "sentido": "Dirección Sur – Norte",
           "lat": -33.5514043,
           "lng": -70.7090613,
+          "heading": 8,
+          "osmNodeId": 6114138863,
           "distanciaKm": 3.97,
           "duracionMin": 5,
           "tarifas": {
@@ -250,12 +1131,13 @@
         {
           "id": "ac-pa21",
           "codigo": "PA21",
-          "nombre": "Pórtico Américo Vespucio – Carlos Valdovinos",
+          "nombre": "Gral. Velásquez: Américo Vespucio – Carlos Valdovinos",
           "autopista": "Autopista Central · Eje Gral. Velásquez",
-          "sentido": "Dirección Sur - Norte",
-          "comuna": "Lo Espejo",
+          "sentido": "Dirección Sur – Norte",
           "lat": -33.5064259,
           "lng": -70.697251,
+          "heading": 22,
+          "osmNodeId": 6116324745,
           "distanciaKm": 4.93,
           "duracionMin": 6,
           "tarifas": {
@@ -267,14 +1149,15 @@
         {
           "id": "ac-pa23",
           "codigo": "PA23",
-          "nombre": "Pórtico Carlos Valdovinos – Alameda",
+          "nombre": "Gral. Velásquez: Carlos Valdovinos – Alameda",
           "autopista": "Autopista Central · Eje Gral. Velásquez",
-          "sentido": "Dirección Sur - Norte",
-          "comuna": "Estación Central",
+          "sentido": "Dirección Sur – Norte",
           "lat": -33.4690606,
           "lng": -70.6881273,
+          "heading": 359,
+          "osmNodeId": 6116324740,
           "distanciaKm": 2.77,
-          "duracionMin": 4,
+          "duracionMin": 3,
           "tarifas": {
             "fuera_punta": 288,
             "punta": 576,
@@ -284,12 +1167,13 @@
         {
           "id": "ac-pa25",
           "codigo": "PA25",
-          "nombre": "Pórtico Alameda – Río Mapocho",
+          "nombre": "Gral. Velásquez: Alameda – Río Mapocho",
           "autopista": "Autopista Central · Eje Gral. Velásquez",
-          "sentido": "Dirección Sur - Norte",
-          "comuna": "Quinta Normal",
+          "sentido": "Dirección Sur – Norte",
           "lat": -33.4467397,
           "lng": -70.6920804,
+          "heading": 4,
+          "osmNodeId": 6116337640,
           "distanciaKm": 4.06,
           "duracionMin": 5,
           "tarifas": {
@@ -301,12 +1185,13 @@
         {
           "id": "ac-pa28",
           "codigo": "PA28",
-          "nombre": "Pórtico Río Mapocho – Ruta 5 Norte",
+          "nombre": "Gral. Velásquez: Río Mapocho – Ruta 5 Norte",
           "autopista": "Autopista Central · Eje Gral. Velásquez",
-          "sentido": "Dirección Sur - Norte",
-          "comuna": "Renca",
+          "sentido": "Dirección Sur – Norte",
           "lat": -33.3822386,
           "lng": -70.6955624,
+          "heading": 26,
+          "osmNodeId": 285899561,
           "distanciaKm": 4.93,
           "duracionMin": 6,
           "tarifas": {
@@ -318,25 +1203,343 @@
       ]
     },
     {
-      "id": "vespucio-sur",
-      "nombre": "Eje Sur-Oriente (Vespucio Sur)",
-      "nombreCorto": "Vespucio Sur",
+      "id": "autopista-central-ns",
+      "nombre": "Autopista Central · Norte – Sur",
+      "nombreCorto": "Autopista Central (N→S)",
+      "descripcion": "Norte–Sur + Gral. Velásquez · Vespucio Norte a Los Guindos",
+      "concesionarias": "Autopista Central",
+      "distanciaTotalKm": 61.9,
+      "duracionEstimadaMin": 72,
+      "porticos": [
+        {
+          "id": "ac-pa18",
+          "codigo": "PA18",
+          "nombre": "Pórtico A. Vespucio Norte – 14 de la Fama",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.3682982,
+          "lng": -70.6994258,
+          "heading": 159,
+          "osmNodeId": 6114138859,
+          "distanciaKm": 4.45,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 462,
+            "punta": 925,
+            "saturacion": 1387
+          }
+        },
+        {
+          "id": "ac-pa15",
+          "codigo": "PA15",
+          "nombre": "Pórtico 14 de la Fama – Río Mapocho",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.4265149,
+          "lng": -70.6688947,
+          "heading": 113,
+          "osmNodeId": 6116236799,
+          "distanciaKm": 4.09,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 425,
+            "punta": 850,
+            "saturacion": 850
+          }
+        },
+        {
+          "id": "ac-pa14",
+          "codigo": "PA14",
+          "nombre": "Pórtico Río Mapocho – Alameda",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.4483818,
+          "lng": -70.6600861,
+          "heading": 164,
+          "osmNodeId": 6114084136,
+          "distanciaKm": 1.75,
+          "duracionMin": 2,
+          "tarifas": {
+            "fuera_punta": 182,
+            "punta": 364,
+            "saturacion": 546
+          }
+        },
+        {
+          "id": "ac-pa12",
+          "codigo": "PA12",
+          "nombre": "Pórtico Alameda – Carlos Valdovinos",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.468848,
+          "lng": -70.6565584,
+          "heading": 179,
+          "osmNodeId": 6114084134,
+          "distanciaKm": 3.55,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 369,
+            "punta": 738,
+            "saturacion": 1107
+          }
+        },
+        {
+          "id": "ac-pa11",
+          "codigo": "PA11",
+          "nombre": "Pórtico Carlos Valdovinos – Departamental",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.4953488,
+          "lng": -70.6638932,
+          "heading": 201,
+          "osmNodeId": 6116371330,
+          "distanciaKm": 2.75,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 286,
+            "punta": 572,
+            "saturacion": 572
+          }
+        },
+        {
+          "id": "ac-pa9",
+          "codigo": "PA9",
+          "nombre": "Pórtico Departamental – Américo Vespucio",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.5071477,
+          "lng": -70.6694242,
+          "heading": 201,
+          "osmNodeId": 6116371333,
+          "distanciaKm": 3.78,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 393,
+            "punta": 786,
+            "saturacion": 786
+          }
+        },
+        {
+          "id": "ac-pa8",
+          "codigo": "PA8",
+          "nombre": "Pórtico Américo Vespucio – Las Acacias",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.5476268,
+          "lng": -70.696839,
+          "heading": 235,
+          "osmNodeId": 2490264558,
+          "distanciaKm": 4.35,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 452,
+            "punta": 904,
+            "saturacion": 904
+          }
+        },
+        {
+          "id": "ac-pa32",
+          "codigo": "PA32",
+          "nombre": "Pórtico Las Acacias – Lo Blanco",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.5588804,
+          "lng": -70.7105862,
+          "heading": 178,
+          "osmNodeId": 157288624,
+          "distanciaKm": 1.7,
+          "duracionMin": 2,
+          "tarifas": {
+            "fuera_punta": 177,
+            "punta": 353,
+            "saturacion": 530
+          }
+        },
+        {
+          "id": "ac-pa6",
+          "codigo": "PA6",
+          "nombre": "Pórtico Lo Blanco – Colón",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.5824122,
+          "lng": -70.7139749,
+          "heading": 186,
+          "osmNodeId": 6114291826,
+          "distanciaKm": 1.52,
+          "duracionMin": 2,
+          "tarifas": {
+            "fuera_punta": 158,
+            "punta": 316,
+            "saturacion": 474
+          }
+        },
+        {
+          "id": "ac-pa37",
+          "codigo": "PA37",
+          "nombre": "Pórtico Colón – Calera de Tango",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.596894,
+          "lng": -70.7157922,
+          "heading": 186,
+          "osmNodeId": 9566814796,
+          "distanciaKm": 4.38,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 455,
+            "punta": 455,
+            "saturacion": 455
+          }
+        },
+        {
+          "id": "ac-pa4",
+          "codigo": "PA4",
+          "nombre": "Pórtico Calera de Tango – La Capilla",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.6219812,
+          "lng": -70.7148676,
+          "heading": 173,
+          "osmNodeId": 6114286295,
+          "distanciaKm": 1.25,
+          "duracionMin": 1,
+          "tarifas": {
+            "fuera_punta": 130,
+            "punta": 130,
+            "saturacion": 130
+          }
+        },
+        {
+          "id": "ac-pa1",
+          "codigo": "PA1",
+          "nombre": "Pórtico La Capilla – Los Guindos",
+          "autopista": "Autopista Central · Eje Norte-Sur",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.647311,
+          "lng": -70.7117629,
+          "heading": 192,
+          "osmNodeId": 265606182,
+          "distanciaKm": 7.68,
+          "duracionMin": 9,
+          "tarifas": {
+            "fuera_punta": 868,
+            "punta": 868,
+            "saturacion": 868
+          }
+        },
+        {
+          "id": "ac-pa29",
+          "codigo": "PA29",
+          "nombre": "Gral. Velásquez: Ruta 5 Norte – Río Mapocho",
+          "autopista": "Autopista Central · Eje Gral. Velásquez",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.3819384,
+          "lng": -70.6954739,
+          "heading": 211,
+          "osmNodeId": 6116337639,
+          "distanciaKm": 4.93,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 512,
+            "punta": 1025,
+            "saturacion": 1025
+          }
+        },
+        {
+          "id": "ac-pa26",
+          "codigo": "PA26",
+          "nombre": "Gral. Velásquez: Río Mapocho – Alameda",
+          "autopista": "Autopista Central · Eje Gral. Velásquez",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.4474517,
+          "lng": -70.6922865,
+          "heading": 185,
+          "osmNodeId": 6116337642,
+          "distanciaKm": 4.06,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 422,
+            "punta": 844,
+            "saturacion": 844
+          }
+        },
+        {
+          "id": "ac-pa24",
+          "codigo": "PA24",
+          "nombre": "Gral. Velásquez: Alameda – Carlos Valdovinos",
+          "autopista": "Autopista Central · Eje Gral. Velásquez",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.4698378,
+          "lng": -70.6882455,
+          "heading": 181,
+          "osmNodeId": 6116324742,
+          "distanciaKm": 2.77,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 288,
+            "punta": 576,
+            "saturacion": 864
+          }
+        },
+        {
+          "id": "ac-pa22",
+          "codigo": "PA22",
+          "nombre": "Gral. Velásquez: Carlos Valdovinos – Américo Vespucio",
+          "autopista": "Autopista Central · Eje Gral. Velásquez",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.5056315,
+          "lng": -70.6970203,
+          "heading": 202,
+          "osmNodeId": 6116324746,
+          "distanciaKm": 4.93,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 512,
+            "punta": 512,
+            "saturacion": 512
+          }
+        },
+        {
+          "id": "ac-pa20",
+          "codigo": "PA20",
+          "nombre": "Gral. Velásquez: Américo Vespucio – Ruta 5 Sur",
+          "autopista": "Autopista Central · Eje Gral. Velásquez",
+          "sentido": "Dirección Norte – Sur",
+          "lat": -33.5364729,
+          "lng": -70.7076591,
+          "heading": 193,
+          "osmNodeId": 5145133779,
+          "distanciaKm": 3.97,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 413,
+            "punta": 413,
+            "saturacion": 413
+          }
+        }
+      ]
+    },
+    {
+      "id": "vespucio-sur-po",
+      "nombre": "Vespucio Sur · Poniente – Oriente",
+      "nombreCorto": "Vespucio Sur (P→O)",
       "descripcion": "2ª Transversal · Gran Avenida · Vicuña Mackenna · Grecia",
       "concesionarias": "Autopista Vespucio Sur",
-      "distanciaTotalKm": 21.9,
-      "duracionEstimadaMin": 29,
+      "distanciaTotalKm": 23.5,
+      "duracionEstimadaMin": 26,
       "porticos": [
         {
           "id": "vs-1-3",
           "codigo": "1.3",
           "nombre": "Pórtico 2ª Transversal – Camino a Melipilla",
           "autopista": "Autopista Vespucio Sur",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "Maipú",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.5058611,
           "lng": -70.728455,
+          "heading": 112,
+          "osmNodeId": 6114181656,
           "distanciaKm": 5.3,
-          "duracionMin": 7,
+          "duracionMin": 6,
           "tarifas": {
             "fuera_punta": 533,
             "punta": 1065,
@@ -348,10 +1551,11 @@
           "codigo": "2.2",
           "nombre": "Pórtico Gral. Velásquez – Ruta 5",
           "autopista": "Autopista Vespucio Sur",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "Cerrillos",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.526262,
           "lng": -70.6941029,
+          "heading": 119,
+          "osmNodeId": 6114181660,
           "distanciaKm": 2.5,
           "duracionMin": 3,
           "tarifas": {
@@ -361,16 +1565,35 @@
           }
         },
         {
+          "id": "vs-3-4",
+          "codigo": "3.4",
+          "nombre": "Pórtico Ruta 5 – Gran Avenida",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.5338163,
+          "lng": -70.6764509,
+          "heading": 112,
+          "osmNodeId": 6114181666,
+          "distanciaKm": 1.2,
+          "duracionMin": 1,
+          "tarifas": {
+            "fuera_punta": 121,
+            "punta": 241,
+            "saturacion": 362
+          }
+        },
+        {
           "id": "vs-3-2",
           "codigo": "3.2",
           "nombre": "Pórtico Gran Avenida – Santa Rosa",
           "autopista": "Autopista Vespucio Sur",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "La Cisterna",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.5398418,
           "lng": -70.6529975,
+          "heading": 102,
+          "osmNodeId": 6114181668,
           "distanciaKm": 4.7,
-          "duracionMin": 6,
+          "duracionMin": 5,
           "tarifas": {
             "fuera_punta": 472,
             "punta": 945,
@@ -378,16 +1601,35 @@
           }
         },
         {
+          "id": "vs-4-3",
+          "codigo": "4.3",
+          "nombre": "Pórtico Coronel – Santa Julia",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.5411533,
+          "lng": -70.6150198,
+          "heading": 82,
+          "osmNodeId": 6114166012,
+          "distanciaKm": 0.45,
+          "duracionMin": 1,
+          "tarifas": {
+            "fuera_punta": 45,
+            "punta": 90,
+            "saturacion": 136
+          }
+        },
+        {
           "id": "vs-4-2",
           "codigo": "4.2",
           "nombre": "Pórtico Gnmo. de Alderete – Vic. Mackenna",
           "autopista": "Autopista Vespucio Sur",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "La Florida",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.5268018,
           "lng": -70.6025742,
+          "heading": 28,
+          "osmNodeId": 6114166014,
           "distanciaKm": 2.65,
-          "duracionMin": 4,
+          "duracionMin": 3,
           "tarifas": {
             "fuera_punta": 266,
             "punta": 533,
@@ -399,12 +1641,13 @@
           "codigo": "5.4",
           "nombre": "Pórtico Las Torres – Quilín",
           "autopista": "Autopista Vespucio Sur",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "Macul",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.4960669,
           "lng": -70.5845023,
+          "heading": 28,
+          "osmNodeId": 6116872049,
           "distanciaKm": 3.81,
-          "duracionMin": 5,
+          "duracionMin": 4,
           "tarifas": {
             "fuera_punta": 383,
             "punta": 766,
@@ -416,16 +1659,154 @@
           "codigo": "5.2",
           "nombre": "Pórtico Quilín – Grecia",
           "autopista": "Autopista Vespucio Sur",
-          "sentido": "Sentido Poniente - Oriente",
-          "comuna": "Peñalolén",
+          "sentido": "Sentido Poniente – Oriente",
           "lat": -33.4810039,
           "lng": -70.5787734,
+          "heading": 11,
+          "osmNodeId": 6116872055,
           "distanciaKm": 2.89,
-          "duracionMin": 4,
+          "duracionMin": 3,
           "tarifas": {
             "fuera_punta": 290,
             "punta": 581,
             "saturacion": 871
+          }
+        }
+      ]
+    },
+    {
+      "id": "vespucio-sur-op",
+      "nombre": "Vespucio Sur · Oriente – Poniente",
+      "nombreCorto": "Vespucio Sur (O→P)",
+      "descripcion": "Grecia · Quilín · Santa Rosa · Ruta 78",
+      "concesionarias": "Autopista Vespucio Sur",
+      "distanciaTotalKm": 23.5,
+      "duracionEstimadaMin": 27,
+      "porticos": [
+        {
+          "id": "vs-5-1",
+          "codigo": "5.1",
+          "nombre": "Pórtico Grecia – Quilín",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4809446,
+          "lng": -70.5790434,
+          "heading": 189,
+          "osmNodeId": 6116872054,
+          "distanciaKm": 1.21,
+          "duracionMin": 1,
+          "tarifas": {
+            "fuera_punta": 122,
+            "punta": 243,
+            "saturacion": 365
+          }
+        },
+        {
+          "id": "vs-5-3",
+          "codigo": "5.3",
+          "nombre": "Pórtico Quilín – Las Torres",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4955584,
+          "lng": -70.5844562,
+          "heading": 208,
+          "osmNodeId": 6116872050,
+          "distanciaKm": 5.49,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 552,
+            "punta": 1103,
+            "saturacion": 1655
+          }
+        },
+        {
+          "id": "vs-4-1",
+          "codigo": "4.1",
+          "nombre": "Pórtico Gnmo. de Alderete – Santa Julia",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.5297901,
+          "lng": -70.6048452,
+          "heading": 210,
+          "osmNodeId": 9624207147,
+          "distanciaKm": 3.1,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 312,
+            "punta": 623,
+            "saturacion": 623
+          }
+        },
+        {
+          "id": "vs-3-1",
+          "codigo": "3.1",
+          "nombre": "Pórtico Santa Rosa – Gran Avenida",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.539608,
+          "lng": -70.6529431,
+          "heading": 282,
+          "osmNodeId": 6114181670,
+          "distanciaKm": 3.31,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 333,
+            "punta": 665,
+            "saturacion": 998
+          }
+        },
+        {
+          "id": "vs-3-3",
+          "codigo": "3.3",
+          "nombre": "Pórtico Gran Avenida – Ruta 5",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.5335852,
+          "lng": -70.6763449,
+          "heading": 291,
+          "osmNodeId": 6114181664,
+          "distanciaKm": 2.59,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 260,
+            "punta": 521,
+            "saturacion": 781
+          }
+        },
+        {
+          "id": "vs-2-1",
+          "codigo": "2.1",
+          "nombre": "Pórtico Ruta 5 – General Velásquez",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.5260519,
+          "lng": -70.6940167,
+          "heading": 299,
+          "osmNodeId": 6114181662,
+          "distanciaKm": 2.5,
+          "duracionMin": 3,
+          "tarifas": {
+            "fuera_punta": 251,
+            "punta": 502,
+            "saturacion": 754
+          }
+        },
+        {
+          "id": "vs-1-1",
+          "codigo": "1.1",
+          "nombre": "Pórtico General Velásquez – Ruta 78",
+          "autopista": "Autopista Vespucio Sur",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.5165613,
+          "lng": -70.7125335,
+          "heading": 295,
+          "osmNodeId": 6114181658,
+          "distanciaKm": 5.3,
+          "duracionMin": 6,
+          "tarifas": {
+            "fuera_punta": 533,
+            "punta": 1065,
+            "saturacion": 1065
           }
         }
       ]

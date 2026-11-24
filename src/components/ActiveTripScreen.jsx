@@ -30,10 +30,16 @@ import PorticoIcon from './PorticoIcon';
 import PorticoNotification from './PorticoNotification';
 
 const SIMULATION_INTERVAL_MS = 3500;
-const DETECTION_RADIUS_METERS = 90;
+const DETECTION_RADIUS_METERS = porticosData.metadata.radioDeteccionMetros || 90;
 const MAX_GPS_ACCURACY_METERS = 65;
 const MIN_SPEED_MPS = 3; // ~10.8 km/h
 const REQUIRED_CONSECUTIVE_HITS = 2;
+const MAX_HEADING_DIFF_DEGREES =
+  porticosData.metadata.toleranciaRumboGrados || 75;
+
+function angularDiffDegrees(userHeading, porticoHeading) {
+  return Math.abs(((userHeading - porticoHeading + 540) % 360) - 180);
+}
 
 function playSubtleChime() {
   try {
@@ -288,8 +294,8 @@ export default function ActiveTripScreen({
             ? speed
             : null;
         const safeHeading =
-          typeof heading === 'number' && Number.isFinite(heading) && heading >= 0
-            ? Math.round(heading)
+          typeof heading === 'number' && !Number.isNaN(heading) && heading >= 0
+            ? Math.round(heading) % 360
             : null;
 
         // Compute nearest uncrossed portico for telemetry and diagnostic logging
@@ -330,6 +336,18 @@ export default function ActiveTripScreen({
             if (crossedIdsRef.current.has(p.id)) return;
 
             if (dist <= DETECTION_RADIUS_METERS) {
+              // Discard opposite-carriageway gantries when GPS heading is available
+              const headingMatches =
+                safeHeading === null ||
+                typeof p.heading !== 'number' ||
+                angularDiffDegrees(safeHeading, p.heading) <=
+                  MAX_HEADING_DIFF_DEGREES;
+
+              if (!headingMatches) {
+                consecutiveHitsRef.current.delete(p.id);
+                return;
+              }
+
               const hits = (consecutiveHitsRef.current.get(p.id) || 0) + 1;
               consecutiveHitsRef.current.set(p.id, hits);
 

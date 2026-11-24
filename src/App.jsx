@@ -12,6 +12,7 @@ import { detectCurrentHorario } from './utils/format';
 import { getSavedAlertLeads, trackEvent } from './utils/analytics';
 import PhoneShell from './components/PhoneShell';
 import OnboardingModal from './components/OnboardingModal';
+import SimulationModal from './components/SimulationModal';
 import HomeScreen from './components/HomeScreen';
 import ActiveTripScreen from './components/ActiveTripScreen';
 import PorticoNotification from './components/PorticoNotification';
@@ -33,6 +34,7 @@ export default function App() {
   const [showSettingsModal, setShowSettingsModal] = useState(
     () => !loadUserConfig().onboardingCompleted
   );
+  const [showSimulationModal, setShowSimulationModal] = useState(false);
 
   const [selectedRouteId, setSelectedRouteId] = useState(
     porticosData.rutas[0].id
@@ -109,10 +111,12 @@ export default function App() {
     setScreen('active');
   };
 
-  const handleStartSimulation = () => {
+  const handleStartSimulation = (customRoute) => {
+    const routeToRun = customRoute || selectedRoute;
     handleNotificationChange(null);
+    setShowSimulationModal(false);
     setActiveSession({
-      route: selectedRoute,
+      route: routeToRun,
       horario: selectedHorario,
       mode: 'simulation',
     });
@@ -120,9 +124,10 @@ export default function App() {
       profile: config.profile,
       monthlyBudget: config.monthlyBudget,
       mode: 'simulation',
-      routeId: selectedRoute.id,
-      routeName: selectedRoute.nombre,
+      routeId: routeToRun.id,
+      routeName: routeToRun.nombre,
       horario: selectedHorario,
+      porticosCount: routeToRun.porticos.length,
     });
     setScreen('active');
   };
@@ -215,6 +220,17 @@ export default function App() {
           onClose={() => setShowSettingsModal(false)}
         />
       )}
+
+      {showSimulationModal && (
+        <SimulationModal
+          selectedRouteId={selectedRouteId}
+          selectedHorario={selectedHorario}
+          onSelectRoute={setSelectedRouteId}
+          onSelectHorario={setSelectedHorario}
+          onStartSimulation={handleStartSimulation}
+          onClose={() => setShowSimulationModal(false)}
+        />
+      )}
     </>
   );
 
@@ -225,12 +241,8 @@ export default function App() {
           config={config}
           monthlySpent={monthlySpent}
           tripsCount={trips.length}
-          selectedRouteId={selectedRouteId}
-          selectedHorario={selectedHorario}
-          onSelectRoute={setSelectedRouteId}
-          onSelectHorario={setSelectedHorario}
           onStartAutoGps={handleStartAutoGps}
-          onStartSimulation={handleStartSimulation}
+          onOpenSimulationModal={() => setShowSimulationModal(true)}
           onOpenSettings={() => setShowSettingsModal(true)}
           onOpenHistory={handleOpenHistory}
         />

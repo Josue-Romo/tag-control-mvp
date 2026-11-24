@@ -30,15 +30,57 @@ import PorticoIcon from './PorticoIcon';
 import PorticoNotification from './PorticoNotification';
 
 const SIMULATION_INTERVAL_MS = 3500;
-const DETECTION_RADIUS_METERS = porticosData.metadata.radioDeteccionMetros || 90;
-const MAX_GPS_ACCURACY_METERS = 65;
+const DETECTION_RADIUS_METERS = 120;
+const MAX_GPS_ACCURACY_METERS = 110;
 const MIN_SPEED_MPS = 3; // ~10.8 km/h
 const REQUIRED_CONSECUTIVE_HITS = 2;
+const MAX_SEGMENT_JUMP_METERS = 4500; // Covers urban highway tunnels (e.g. Costanera Norte) while blocking teleports
+const MIN_SEGMENT_MOVEMENT_METERS = 20;
 const MAX_HEADING_DIFF_DEGREES =
   porticosData.metadata.toleranciaRumboGrados || 75;
 
+const DEG_TO_RAD = Math.PI / 180;
+const METERS_PER_DEG_LAT = 111132.92;
+
 function angularDiffDegrees(userHeading, porticoHeading) {
   return Math.abs(((userHeading - porticoHeading + 540) % 360) - 180);
+}
+
+function bearingDegrees(lat1, lng1, lat2, lng2) {
+  const y = Math.sin((lng2 - lng1) * DEG_TO_RAD) * Math.cos(lat2 * DEG_TO_RAD);
+  const x =
+    Math.cos(lat1 * DEG_TO_RAD) * Math.sin(lat2 * DEG_TO_RAD) -
+    Math.sin(lat1 * DEG_TO_RAD) *
+      Math.cos(lat2 * DEG_TO_RAD) *
+      Math.cos((lng2 - lng1) * DEG_TO_RAD);
+  return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
+}
+
+/**
+ * Computes minimum orthogonal distance (meters) from a portico (pLat, pLng)
+ * to the travel segment A(aLat, aLng) -> B(bLat, bLng), plus projection t in [0, 1].
+ */
+function pointToSegmentMetrics(pLat, pLng, aLat, aLng, bLat, bLng) {
+  const metersPerDegLng = 111319.49 * Math.cos(pLat * DEG_TO_RAD);
+  const ax = (aLng - pLng) * metersPerDegLng;
+  const ay = (aLat - pLat) * METERS_PER_DEG_LAT;
+  const bx = (bLng - pLng) * metersPerDegLng;
+  const by = (bLat - pLat) * METERS_PER_DEG_LAT;
+
+  const dx = bx - ax;
+  const dy = by - ay;
+  const lenSq = dx * dx + dy * dy;
+
+  if (lenSq === 0) {
+    return { distanceMeters: Math.hypot(ax, ay), t: 0 };
+  }
+
+  const rawT = -(ax * dx + ay * dy) / lenSq;
+  const t = Math.max(0, Math.min(1, rawT));
+  const closestX = ax + t * dx;
+  const closestY = ay + t * dy;
+
+  return { distanceMeters: Math.hypot(closestX, closestY), t };
 }
 
 function playSubtleChime() {
@@ -88,11 +130,14 @@ export default function ActiveTripScreen({
     nearestName: null,
   });
   const [gpsLogCount, setGpsLogCount] = useState(0);
+  const [wakeLockActive, setWakeLockActive] = useState(false);
 
   const tripStartRef = useRef(new Date());
   const crossedIdsRef = useRef(new Set());
   const crossedListRef = useRef([]);
   const consecutiveHitsRef = useRef(new Map());
+  const prevPositionRef = useRef(null);
+  const wakeLockRef = useRef(null);
   const gpsDebugLogRef = useRef([]);
   const finishedRef = useRef(false);
 
@@ -259,13 +304,65 @@ export default function ActiveTripScreen({
     route.porticos,
   ]);
 
-  // Real GPS mode via navigator.geolocation (hardened accuracy + speed/consecutive hit filter)
+  // Keep screen awake during Real GPS mode so mobile OS does not pause geolocation
+  useEffect(() => {
+    if (mode !== 'gps') return;
+
+    let cancelled = false;
+
+    const acquireWakeLock = async () => {
+      if (
+        typeof navigator === 'undefined' ||
+        !('wakeLock' in navigator) ||
+        typeof navigator.wakeLock?.request !== 'function'
+      ) {
+        return;
+      }
+      try {
+        const sentinel = await navigator.wakeLock.request('screen');
+        if (cancelled) {
+          sentinel.release().catch(() => {});
+          return;
+        }
+        wakeLockRef.current = sentinel;
+        setWakeLockActive(true);
+        sentinel.addEventListener('release', () => {
+          if (!cancelled) setWakeLockActive(false);
+        });
+      } catch {
+        // Wake Lock may be rejected on low battery or unsupported browsers; fail silently
+        if (!cancelled) setWakeLockActive(false);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void acquireWakeLock();
+      }
+    };
+
+    void acquireWakeLock();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      cancelled = true;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release().catch(() => {});
+        wakeLockRef.current = null;
+      }
+      setWakeLockActive(false);
+    };
+  }, [mode]);
+
+  // Real GPS mode via navigator.geolocation (hardened accuracy + segment crossing + heading filter)
   useEffect(() => {
     if (mode !== 'gps') return;
 
     // Reset fresh diagnostic trace for this GPS trip
     gpsDebugLogRef.current = [];
     consecutiveHitsRef.current = new Map();
+    prevPositionRef.current = null;
     saveGpsDebugLog([]);
     setGpsLogCount(0);
 
@@ -298,7 +395,7 @@ export default function ActiveTripScreen({
             ? Math.round(heading) % 360
             : null;
 
-        // Compute nearest uncrossed portico for telemetry and diagnostic logging
+        // Compute point distance to every portico for live nearest display & debug log
         let nearest = null;
         const distances = route.porticos.map((p) => {
           const dist = haversineDistanceMeters(latitude, longitude, p.lat, p.lng);
@@ -315,7 +412,7 @@ export default function ActiveTripScreen({
           safeAccuracy === null || safeAccuracy > MAX_GPS_ACCURACY_METERS;
 
         if (isLowAccuracy) {
-          // Ignore cell/Wi-Fi triangulation jumps (> 65m); reset consecutive counters
+          // Ignore cell/Wi-Fi triangulation jumps (> 110m); reset consecutive counters
           consecutiveHitsRef.current.clear();
 
           setGpsState((prev) => ({
@@ -326,21 +423,60 @@ export default function ActiveTripScreen({
             speed: safeSpeed,
           }));
         } else {
-          // Valid high-accuracy reading (<= 65m): evaluate 90m portico radius
+          // Valid reading (<= 110m): evaluate BOTH orthogonal segment crossing & 120m radius
+          const prevPos = prevPositionRef.current;
+          const segmentLength = prevPos
+            ? haversineDistanceMeters(
+                prevPos.lat,
+                prevPos.lng,
+                latitude,
+                longitude
+              )
+            : 0;
+          const canUseSegment =
+            Boolean(prevPos) &&
+            segmentLength >= MIN_SEGMENT_MOVEMENT_METERS &&
+            segmentLength <= MAX_SEGMENT_JUMP_METERS;
+
+          // Use GPS heading if available; otherwise infer travel bearing from the movement segment
+          const effectiveHeading =
+            safeHeading !== null
+              ? safeHeading
+              : canUseSegment
+              ? Math.round(
+                  bearingDegrees(prevPos.lat, prevPos.lng, latitude, longitude)
+                ) % 360
+              : null;
+
           const isMovingFast =
             safeSpeed !== null && safeSpeed > MIN_SPEED_MPS;
           const isStationaryAtLight =
-            safeSpeed !== null && safeSpeed < 1;
+            safeSpeed !== null && safeSpeed < 1 && !canUseSegment;
+
+          const triggeredCandidates = [];
 
           distances.forEach(({ portico: p, dist }) => {
             if (crossedIdsRef.current.has(p.id)) return;
 
-            if (dist <= DETECTION_RADIUS_METERS) {
-              // Discard opposite-carriageway gantries when GPS heading is available
+            const segMetrics = canUseSegment
+              ? pointToSegmentMetrics(
+                  p.lat,
+                  p.lng,
+                  prevPos.lat,
+                  prevPos.lng,
+                  latitude,
+                  longitude
+                )
+              : { distanceMeters: dist, t: 1 };
+
+            const minDist = Math.min(dist, segMetrics.distanceMeters);
+
+            if (minDist <= DETECTION_RADIUS_METERS) {
+              // Discard opposite-carriageway gantries when heading is known (> 75°)
               const headingMatches =
-                safeHeading === null ||
+                effectiveHeading === null ||
                 typeof p.heading !== 'number' ||
-                angularDiffDegrees(safeHeading, p.heading) <=
+                angularDiffDegrees(effectiveHeading, p.heading) <=
                   MAX_HEADING_DIFF_DEGREES;
 
               if (!headingMatches) {
@@ -348,24 +484,46 @@ export default function ActiveTripScreen({
                 return;
               }
 
+              const crossedBySegment =
+                canUseSegment &&
+                segMetrics.distanceMeters <= DETECTION_RADIUS_METERS;
+
               const hits = (consecutiveHitsRef.current.get(p.id) || 0) + 1;
               consecutiveHitsRef.current.set(p.id, hits);
 
-              // Trigger if moving > 3 m/s (~11 km/h), OR if >= 2 consecutive readings
-              // when speed isn't reported (or moving slowly in highway traffic, not stopped)
+              // Trigger automatically on segment crossing (prevents skipping at 100 km/h
+              // or tunnel exits), OR when moving > 3 m/s, OR >= 2 consecutive readings
               const confirmedCrossing =
+                crossedBySegment ||
                 isMovingFast ||
                 (!isStationaryAtLight && hits >= REQUIRED_CONSECUTIVE_HITS);
 
               if (confirmedCrossing) {
-                registerPortico(p);
+                triggeredCandidates.push({
+                  portico: p,
+                  orderT: crossedBySegment ? segMetrics.t : 1,
+                });
                 consecutiveHitsRef.current.delete(p.id);
-                triggered = true;
               }
             } else {
               consecutiveHitsRef.current.delete(p.id);
             }
           });
+
+          // Register crossed gantries in chronological travel order along the segment
+          triggeredCandidates
+            .sort((a, b) => a.orderT - b.orderT)
+            .forEach(({ portico }) => {
+              registerPortico(portico);
+              triggered = true;
+            });
+
+          // Advance prevPosition only on valid high-accuracy readings
+          prevPositionRef.current = {
+            lat: latitude,
+            lng: longitude,
+            timestamp: pos.timestamp || Date.now(),
+          };
 
           setGpsState({
             status: 'active',
@@ -642,6 +800,10 @@ export default function ActiveTripScreen({
                     {MAX_GPS_ACCURACY_METERS} m.
                   </p>
                 )}
+                <p className="text-[11px] text-slate-600 bg-slate-50 border border-slate-100 rounded-xl px-2.5 py-2 mt-2 leading-snug">
+                  Cálculo automático por GPS satelital (no necesitas acercar el
+                  teléfono al TAG). Mantén esta pantalla abierta durante el viaje.
+                </p>
               </div>
             </div>
 
@@ -650,6 +812,7 @@ export default function ActiveTripScreen({
               <span className="text-[10.5px] text-slate-400 tabular-nums">
                 Diagnóstico GPS · {gpsLogCount}{' '}
                 {gpsLogCount === 1 ? 'lectura' : 'lecturas'}
+                {wakeLockActive ? ' · Pantalla activa' : ''}
               </span>
               <button
                 type="button"

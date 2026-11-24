@@ -3,7 +3,7 @@
     "ciudad": "Santiago de Chile",
     "moneda": "CLP",
     "versionTarifas": "Oficial 2026 (Categoría 1 y 4 · Red Completa Ambos Sentidos)",
-    "radioDeteccionMetros": 90,
+    "radioDeteccionMetros": 120,
     "toleranciaRumboGrados": 75,
     "totalPorticos": 94
   },

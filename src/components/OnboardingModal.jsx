@@ -3,7 +3,8 @@ import { Car, Check, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
 import { DRIVER_PROFILES } from '../utils/storage';
 import { formatCLP } from '../utils/format';
 
-const QUICK_BUDGETS = [40000, 60000, 100000, 150000, 200000, 280000];
+const QUICK_BUDGETS = [30000, 40000, 60000, 100000, 150000, 200000, 280000];
+const MIN_BUDGET = 5000;
 
 export default function OnboardingModal({
   config,
@@ -12,24 +13,38 @@ export default function OnboardingModal({
   onClose,
 }) {
   const [profile, setProfile] = useState(config.profile || 'particular');
-  const [budget, setBudget] = useState(String(config.monthlyBudget || 60000));
-
-  const numericBudget = Math.max(
-    10000,
-    parseInt(String(budget).replace(/[^\d]/g, ''), 10) || 60000
+  const [budgetRaw, setBudgetRaw] = useState(
+    String(config.monthlyBudget || 60000)
   );
+
+  const parsedBudget = budgetRaw === '' ? null : parseInt(budgetRaw, 10);
+  const formattedInputValue =
+    parsedBudget === null ? '' : parsedBudget.toLocaleString('es-CL');
 
   const handleProfilePick = (p) => {
     setProfile(p.id);
-    setBudget(String(p.suggestedBudget));
+    setBudgetRaw(String(p.suggestedBudget));
+  };
+
+  const handleBudgetChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 7);
+    setBudgetRaw(digits);
+  };
+
+  const handleBudgetBlur = () => {
+    if (budgetRaw === '' || parseInt(budgetRaw, 10) < MIN_BUDGET) {
+      setBudgetRaw(String(MIN_BUDGET));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (budgetRaw === '') return;
+    const finalBudget = Math.max(MIN_BUDGET, parsedBudget || MIN_BUDGET);
     onSave({
       ...config,
       profile,
-      monthlyBudget: numericBudget,
+      monthlyBudget: finalBudget,
       onboardingCompleted: true,
     });
   };
@@ -131,27 +146,32 @@ export default function OnboardingModal({
                 id="monthly-budget-input"
                 type="text"
                 inputMode="numeric"
-                value={numericBudget.toLocaleString('es-CL')}
-                onChange={(e) => {
-                  const raw = e.target.value.replace(/[^\d]/g, '');
-                  setBudget(raw || '0');
-                }}
-                className="w-full rounded-2xl border-2 border-slate-200 focus:border-[#1E7E53] focus:outline-none pl-9 pr-14 py-3 text-2xl font-extrabold text-slate-900 tabular-nums transition"
+                placeholder="Ej. 30.000"
+                value={formattedInputValue}
+                onChange={handleBudgetChange}
+                onBlur={handleBudgetBlur}
+                className="w-full rounded-2xl border-2 border-slate-200 focus:border-[#1E7E53] focus:outline-none pl-9 pr-14 py-3 text-2xl font-extrabold text-slate-900 placeholder:text-slate-300 tabular-nums transition"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
                 CLP
               </span>
             </div>
 
+            {parsedBudget !== null && parsedBudget < MIN_BUDGET && (
+              <p className="text-[11px] text-amber-600 font-medium mt-1.5">
+                Al confirmar se ajustará al mínimo de {formatCLP(MIN_BUDGET)}.
+              </p>
+            )}
+
             {/* Quick chips */}
             <div className="flex flex-wrap gap-1.5 mt-2.5">
               {QUICK_BUDGETS.map((preset) => {
-                const active = numericBudget === preset;
+                const active = parsedBudget === preset;
                 return (
                   <button
                     key={preset}
                     type="button"
-                    onClick={() => setBudget(String(preset))}
+                    onClick={() => setBudgetRaw(String(preset))}
                     className={`px-2.5 py-1 rounded-full text-xs font-semibold tabular-nums border transition cursor-pointer ${
                       active
                         ? 'bg-[#1E7E53] text-white border-[#1E7E53]'
@@ -174,7 +194,8 @@ export default function OnboardingModal({
 
           <button
             type="submit"
-            className="w-full py-3.5 px-4 rounded-2xl bg-[#1E7E53] hover:bg-[#15803D] active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-emerald-900/15 flex items-center justify-center gap-2 transition cursor-pointer"
+            disabled={budgetRaw === ''}
+            className="w-full py-3.5 px-4 rounded-2xl bg-[#1E7E53] hover:bg-[#15803D] disabled:opacity-45 disabled:cursor-not-allowed active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-emerald-900/15 flex items-center justify-center gap-2 transition cursor-pointer"
           >
             <Check className="w-4 h-4" />
             {isInitial ? 'Comenzar con TAG Control' : 'Guardar cambios'}

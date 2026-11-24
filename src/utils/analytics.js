@@ -1,4 +1,4 @@
-const REMOTE_TRACKING_ENABLED = false;
+const REMOTE_TRACKING_ENABLED = true;
 
 const EVENTS_KEY = 'tag_control_analytics_events';
 const LEADS_KEY = 'tag_control_alert_leads';
@@ -11,8 +11,8 @@ let fallbackSessionId = null;
 
 /**
  * Checks whether remote Formspree telemetry is active.
- * Defaults to REMOTE_TRACKING_ENABLED (false for internal review) and can be
- * dynamically enabled for the current tab via ?live=1 (persisted in sessionStorage).
+ * Defaults to REMOTE_TRACKING_ENABLED (true for P2 field tests) and can be
+ * dynamically overridden for the current tab via ?live=1 or ?live=0 (persisted in sessionStorage).
  */
 export function isRemoteTrackingEnabled() {
   if (typeof window !== 'undefined') {
@@ -24,12 +24,12 @@ export function isRemoteTrackingEnabled() {
         return true;
       }
       if (liveParam === '0') {
-        window.sessionStorage.removeItem(LIVE_MODE_KEY);
+        window.sessionStorage.setItem(LIVE_MODE_KEY, '0');
         return false;
       }
-      if (window.sessionStorage.getItem(LIVE_MODE_KEY) === '1') {
-        return true;
-      }
+      const stored = window.sessionStorage.getItem(LIVE_MODE_KEY);
+      if (stored === '1') return true;
+      if (stored === '0') return false;
     } catch {
       // Ignore URL or sessionStorage access errors
     }

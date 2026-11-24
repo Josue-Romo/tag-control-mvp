@@ -145,10 +145,18 @@ export default function App() {
       setActiveSession(null);
       setScreen('summary');
 
+      const updatedMonthlySpent =
+        monthlySpent + (Number(completedTrip.totalCost) || 0);
+      const safeBudget = Math.max(1, Number(config.monthlyBudget) || 60000);
+      const budgetPercentage = Math.round(
+        (updatedMonthlySpent / safeBudget) * 100
+      );
+
       trackEvent('trip_completed', {
         tripId: completedTrip.id,
         profile: config.profile,
         monthlyBudget: config.monthlyBudget,
+        budgetPercentage,
         mode: completedTrip.mode,
         routeId: completedTrip.routeId,
         routeName: completedTrip.routeName,
@@ -159,7 +167,7 @@ export default function App() {
         durationMin: completedTrip.durationMin,
       });
     },
-    [config.monthlyBudget, config.profile, handleNotificationChange]
+    [config.monthlyBudget, config.profile, handleNotificationChange, monthlySpent]
   );
 
   const handleCancelTrip = () => {

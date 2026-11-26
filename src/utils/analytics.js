@@ -147,7 +147,12 @@ export function trackEvent(eventName, payload = {}) {
   };
 
   const remoteEnabled = isRemoteTrackingEnabled();
-  const shouldSendRemote = remoteEnabled && CRITICAL_REMOTE_EVENTS.has(eventName);
+  const passesTripPorticoCheck =
+    eventName !== 'trip_completed' || Number(payload?.porticosCount) >= 1;
+  const shouldSendRemote =
+    remoteEnabled &&
+    CRITICAL_REMOTE_EVENTS.has(eventName) &&
+    passesTripPorticoCheck;
 
   if (shouldSendRemote) {
     void sendToFormspree(formspreePayload);

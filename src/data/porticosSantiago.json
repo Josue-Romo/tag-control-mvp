@@ -5,7 +5,7 @@
     "versionTarifas": "Oficial 2026 (Categoría 1 y 4 · Red Completa Ambos Sentidos)",
     "radioDeteccionMetros": 120,
     "toleranciaRumboGrados": 75,
-    "totalPorticos": 94
+    "totalPorticos": 104
   },
   "horarios": [
     {
@@ -1807,6 +1807,208 @@
             "fuera_punta": 533,
             "punta": 1065,
             "saturacion": 1065
+          }
+        }
+      ]
+    },
+    {
+      "id": "ruta-68-op",
+      "nombre": "Ruta 68 · Oriente – Poniente (Santiago → Costa)",
+      "nombreCorto": "Ruta 68 (Santiago→Costa)",
+      "descripcion": "Pudahuel · Lo Aguirre · Lo Prado · Curacaví · Zapata",
+      "concesionarias": "Rutas del Pacífico (Ruta 68)",
+      "distanciaTotalKm": 69.4,
+      "duracionEstimadaMin": 56,
+      "porticos": [
+        {
+          "id": "r68-lat-pud-op",
+          "codigo": "LAT-PUD",
+          "nombre": "Lateral Pudahuel / Enlace Vespucio",
+          "autopista": "Ruta 68 · Rutas del Pacífico",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4445832,
+          "lng": -70.7848084,
+          "heading": 283,
+          "osmNodeId": 243646492,
+          "distanciaKm": 4.5,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 1100,
+            "punta": 1100,
+            "saturacion": 1100
+          }
+        },
+        {
+          "id": "r68-lat-aguirre-op",
+          "codigo": "LAT-AGU",
+          "nombre": "Lateral Lomas de Lo Aguirre / Noviciado",
+          "autopista": "Ruta 68 · Rutas del Pacífico",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4431507,
+          "lng": -70.8484745,
+          "heading": 252,
+          "osmNodeId": 253282897,
+          "distanciaKm": 6,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 1100,
+            "punta": 1100,
+            "saturacion": 1100
+          }
+        },
+        {
+          "id": "r68-troncal-loprado-op",
+          "codigo": "T-LP",
+          "nombre": "Troncal Lo Prado Free Flow",
+          "autopista": "Ruta 68 · Rutas del Pacífico",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.455434,
+          "lng": -70.8948976,
+          "heading": 248,
+          "osmNodeId": 9651968600,
+          "distanciaKm": 17.9,
+          "duracionMin": 14,
+          "tarifas": {
+            "fuera_punta": 2700,
+            "punta": 4000,
+            "saturacion": 4000
+          }
+        },
+        {
+          "id": "r68-lat-curacavi-op",
+          "codigo": "LAT-CUR",
+          "nombre": "Lateral Curacaví",
+          "autopista": "Ruta 68 · Rutas del Pacífico",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.4009602,
+          "lng": -71.1138663,
+          "heading": 270,
+          "osmNodeId": 243646318,
+          "distanciaKm": 24,
+          "duracionMin": 19,
+          "tarifas": {
+            "fuera_punta": 1100,
+            "punta": 1100,
+            "saturacion": 1100
+          }
+        },
+        {
+          "id": "r68-troncal-zapata-op",
+          "codigo": "T-ZAP",
+          "nombre": "Troncal Zapata Free Flow",
+          "autopista": "Ruta 68 · Rutas del Pacífico",
+          "sentido": "Sentido Oriente – Poniente",
+          "lat": -33.3689679,
+          "lng": -71.3032001,
+          "heading": 305,
+          "osmNodeId": 9668288306,
+          "distanciaKm": 17,
+          "duracionMin": 14,
+          "tarifas": {
+            "fuera_punta": 2700,
+            "punta": 4000,
+            "saturacion": 4000
+          }
+        }
+      ]
+    },
+    {
+      "id": "ruta-68-po",
+      "nombre": "Ruta 68 · Poniente – Oriente (Costa → Santiago)",
+      "nombreCorto": "Ruta 68 (Costa→Santiago)",
+      "descripcion": "Zapata · Curacaví · Lo Prado · Lo Aguirre · Pudahuel",
+      "concesionarias": "Rutas del Pacífico (Ruta 68)",
+      "distanciaTotalKm": 69.4,
+      "duracionEstimadaMin": 56,
+      "porticos": [
+        {
+          "id": "r68-troncal-zapata-po",
+          "codigo": "T-ZAP",
+          "nombre": "Troncal Zapata Free Flow",
+          "autopista": "Ruta 68 · Rutas del Pacífico",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.3690452,
+          "lng": -71.303257,
+          "heading": 124,
+          "osmNodeId": 9668288305,
+          "distanciaKm": 17,
+          "duracionMin": 14,
+          "tarifas": {
+            "fuera_punta": 2700,
+            "punta": 4000,
+            "saturacion": 4000
+          }
+        },
+        {
+          "id": "r68-lat-curacavi-po",
+          "codigo": "LAT-CUR",
+          "nombre": "Lateral Curacaví",
+          "autopista": "Ruta 68 · Rutas del Pacífico",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4011214,
+          "lng": -71.1146121,
+          "heading": 83,
+          "osmNodeId": 4909855914,
+          "distanciaKm": 24,
+          "duracionMin": 19,
+          "tarifas": {
+            "fuera_punta": 1100,
+            "punta": 1100,
+            "saturacion": 1100
+          }
+        },
+        {
+          "id": "r68-troncal-loprado-po",
+          "codigo": "T-LP",
+          "nombre": "Troncal Lo Prado Free Flow",
+          "autopista": "Ruta 68 · Rutas del Pacífico",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4555165,
+          "lng": -70.8948554,
+          "heading": 68,
+          "osmNodeId": 9651968599,
+          "distanciaKm": 17.9,
+          "duracionMin": 14,
+          "tarifas": {
+            "fuera_punta": 2700,
+            "punta": 4000,
+            "saturacion": 4000
+          }
+        },
+        {
+          "id": "r68-lat-aguirre-po",
+          "codigo": "LAT-AGU",
+          "nombre": "Lateral Lomas de Lo Aguirre / Noviciado",
+          "autopista": "Ruta 68 · Rutas del Pacífico",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4432404,
+          "lng": -70.8484242,
+          "heading": 72,
+          "osmNodeId": 253282903,
+          "distanciaKm": 6,
+          "duracionMin": 5,
+          "tarifas": {
+            "fuera_punta": 1100,
+            "punta": 1100,
+            "saturacion": 1100
+          }
+        },
+        {
+          "id": "r68-lat-pud-po",
+          "codigo": "LAT-PUD",
+          "nombre": "Lateral Pudahuel / Enlace Vespucio",
+          "autopista": "Ruta 68 · Rutas del Pacífico",
+          "sentido": "Sentido Poniente – Oriente",
+          "lat": -33.4446891,
+          "lng": -70.7849495,
+          "heading": 104,
+          "osmNodeId": 3882395183,
+          "distanciaKm": 4.5,
+          "duracionMin": 4,
+          "tarifas": {
+            "fuera_punta": 1100,
+            "punta": 1100,
+            "saturacion": 1100
           }
         }
       ]

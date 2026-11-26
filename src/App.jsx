@@ -23,7 +23,7 @@ const AUTO_GPS_ROUTE = {
   id: 'auto-gps-santiago',
   nombre: 'Seguimiento automático · Red Santiago',
   nombreCorto: 'Red Santiago (GPS)',
-  descripcion: 'Vespucio Norte · Costanera Norte · Autopista Central · Vespucio Sur',
+  descripcion: 'Vespucio Norte · Costanera Norte · Autopista Central · Vespucio Sur · Ruta 68',
   porticos: porticosData.rutas.flatMap((r) => r.porticos),
 };
 
